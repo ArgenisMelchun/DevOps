@@ -39,13 +39,15 @@ jobs:
         run: |
           pip install cfn-lint
           gem install cfn-nag
+        env:
+          GEM_HOME: $HOME/.gem
 
       # Step 6: Lint and validate the main CloudFormation template
       - name: Lint and validate CloudFormation
         run: |
-          cfn-lint aws/main-template.yaml
+          cfn-lint aws/main.yaml
           aws cloudformation validate-template \
-            --template-url https://s3.amazonaws.com/stack-vwm-advanced-logistics-analytics-infrastructure/main-template.yaml
+            --template-url https://s3.amazonaws.com/stack-vwm-advanced-logistics-analytics-infrastructure/main.yaml
 
       # Step 7: Check for drift detection
       - name: Detect stack drift
