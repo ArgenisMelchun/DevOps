@@ -157,7 +157,7 @@ jobs:
           PARAMETERS="[
             {\"ParameterKey\":\"BackendContainerName\",\"ParameterValue\":\"BackContainer\"},
             {\"ParameterKey\":\"BackendContainerPort\",\"ParameterValue\":\"5000\"},
-            {\"ParameterKey\":\"BackendImageRepository\",\"ParameterValue\":\"${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-backend:${{ github.ref_name }}\"},
+            {\"ParameterKey\":\"BackendImageRepository\",\"ParameterValue\":\"vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}\"},
             {\"ParameterKey\":\"BackendServiceName\",\"ParameterValue\":\"backend\"},
             {\"ParameterKey\":\"BackendTargetGroupName\",\"ParameterValue\":\"backend-tg\"},
             {\"ParameterKey\":\"BaseTemplateURL\",\"ParameterValue\":\"https://stack-vwm-advanced-logistics-analytics-infrastructure\"},
@@ -170,7 +170,7 @@ jobs:
             {\"ParameterKey\":\"DesiredCount\",\"ParameterValue\":\"1\"},
             {\"ParameterKey\":\"FrontendContainerName\",\"ParameterValue\":\"FrontendContainer\"},
             {\"ParameterKey\":\"FrontendContainerPort\",\"ParameterValue\":\"80\"},
-            {\"ParameterKey\":\"FrontendImageRepository\",\"ParameterValue\":\"${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-frontend:${{ github.ref_name }}\"},
+            {\"ParameterKey\":\"FrontendImageRepository\",\"ParameterValue\":\"vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}\"},
             {\"ParameterKey\":\"FrontendTargetGroupName\",\"ParameterValue\":\"frontend-tg\"},
             {\"ParameterKey\":\"HealthCheckImageRepository\",\"ParameterValue\":\"vwm-advanced-logistics-analytics-infrastructure-health-check:latest\"},
             {\"ParameterKey\":\"MLContainerName\",\"ParameterValue\":\"MLContainer\"},
