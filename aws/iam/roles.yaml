@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create IAM roles
+
+Parameters:
+  StackName:
+    Type: String
+    Default: roles.yaml
+
+  ResourcesPrefix:
+    Type: String
+
+  SecretArn:
+    Type: String
+
+Resources:
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ResourcesPrefix}-ecs-taskexecution-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: SecretsManagerAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Ref SecretArn
+        - PolicyName: CloudWatchLogsAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/${ResourcesPrefix}-task:*"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-ecs-taskexecution-role"
+        - Key: Stack
+          Value: !Ref StackName
+  
+  EventBridgeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ResourcesPrefix}-eventbridge-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "events.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: AllowECSTaskExecution
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:RunTask
+                Resource: "*" 
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: !GetAtt TaskExecutionRole.Arn
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-eventbridge-role"
+        - Key: Stack
+          Value: !Ref StackName
+
+
+Outputs:
+  TaskExecutionRoleARN:
+    Description: Role for the ECS task execution
+    Value: !GetAtt TaskExecutionRole.Arn
+
+  EventBridgeRoleArn:
+    Description: "ARN del Role utilizado por EventBridge para ejecutar ECS Task"
+    Value: !GetAtt EventBridgeRole.Arn

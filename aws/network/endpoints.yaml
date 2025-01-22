@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create VPC Endpoints
+
+Parameters:
+  VPCId:
+    Type: String
+
+  PrivateSubnets:
+    Type: String
+
+  RouteTables:
+    Type: String
+
+  VPCEndpointsSecurityGroup:
+    Type: String
+
+  StackName:
+    Type: String
+    Default: endpoints.yaml
+
+  ResourcesPrefix:
+    Type: String
+
+Resources:
+  ECRDKREndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.ecr.dkr
+      VpcId: !Ref VPCId
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Split [",", !Ref PrivateSubnets]]
+      SecurityGroupIds:
+        - !Ref VPCEndpointsSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-ecr-dkr-vpce"
+        - Key: Stack
+          Value: !Ref StackName
+
+  ECRAPIEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ecr.api"
+      VpcId: !Ref VPCId
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Split [",", !Ref PrivateSubnets]]
+      SecurityGroupIds:
+        - !Ref VPCEndpointsSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-ecr-api-vpce"
+        - Key: Stack
+          Value: !Ref StackName
+
+  SecretsManagerEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.secretsmanager"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Split [",", !Ref PrivateSubnets]]
+      SecurityGroupIds:
+        - !Ref VPCEndpointsSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-secretsmanager-vpce"
+        - Key: Stack
+          Value: !Ref StackName
+
+  CloudWatchLogsEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPCId
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.logs"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: 
+        - !Select [0, !Split [",", !Ref PrivateSubnets]] 
+      SecurityGroupIds:
+        - !Ref VPCEndpointsSecurityGroup 
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-cloudwatch-logs-vpce"
+        - Key: Stack
+          Value: !Ref StackName
+
+  S3GatewayEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+      VpcId: !Ref VPCId
+      VpcEndpointType: Gateway
+      RouteTableIds: !Split [",", !Ref RouteTables]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: "s3:*"
+            Resource: "*"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-s3-gateway-vpce"
+        - Key: Stack
+          Value: !Ref StackName
+
+# ✅ ToDos (Best Practices)
+# 1. Improve S3 enpoint policy
+# 2. Use conditions such as aws:SourceVpce

@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create Application Load Balancer
+
+Parameters:
+  VPCId:
+    Type: String
+
+  PublicSubnets:
+    Type: String
+
+  ALBSecurityGroup:
+    Type: String
+
+  StackName:
+    Type: String
+    Default: alb.yaml
+
+  ResourcesPrefix:
+    Type: String
+
+Resources:
+  ALB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${ResourcesPrefix}-alb"
+      Scheme: internet-facing
+      Subnets: !Split [",", !Ref PublicSubnets]
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-alb"
+        - Key: Stack
+          Value: !Ref StackName
+
+Outputs:
+  ALB:
+    Description: Logical ID of the ALB resource
+    Value: !Ref ALB
+  
+  ALBDNSName:
+    Description: DNS Name of the ALB resource
+    Value: !GetAtt ALB.DNSName
+
+# ✅ ToDos (Best Practices)
+# 1.- Enabled "AccessLogs"
+# 2.- Enabled 'SSL/TLS' for por 443

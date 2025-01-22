@@ -1,0 +1,134 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create an RDS instance with managed master password using the default KMS key
+
+Parameters:
+  ResourcesPrefix:
+    Type: String
+
+  DBUsername:
+    Type: String
+    Default: postgres
+
+  DBInstanceClass:
+    Type: String
+    Default: db.t3.micro
+
+  DBEngine:
+    Type: String
+    Default: postgres
+
+  DatabaseSecurityGroup:
+    Type: String
+
+  PrivateSubnets:
+    Type: String
+
+  StackName:
+    Type: String
+    Default: rds.yaml
+
+  AllocatedStorage:
+    Type: Number
+    Default: 5
+    MinValue: 5
+    MaxValue: 200
+    Description: The allocated storage size in GB for the RDS instance
+
+  DBBackupRetentionPeriod:
+    Type: Number
+    Description: Number of days to retain automatic backups
+
+  DBPreferredBackupWindow:
+    Type: String
+    Description: Time window for automated backups (UTC time)
+
+  DBPreferredMaintenanceWindow:
+    Type: String
+    Description: Time window for RDS maintenance (UTC time)
+
+Resources:
+  RDSSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}/rds-master-password"
+      Description: "Master password for RDS instance"
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${DBUsername}"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-rds-secret"
+        - Key: Stack
+          Value: !Ref StackName
+
+  RDSSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for the RDS instance
+      SubnetIds: !Split [",", !Ref PrivateSubnets]
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-rds-subnet-group"
+        - Key: Stack
+          Value: !Ref StackName
+
+  RDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Sub "${ResourcesPrefix}-rds-instance"
+      DBName: !Sub "${ResourcesPrefix}database"
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${RDSSecret}::password}}"
+      Engine: !Ref DBEngine
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref AllocatedStorage
+      DBSubnetGroupName: !Ref RDSSubnetGroup
+      VPCSecurityGroups:
+        - !Ref DatabaseSecurityGroup
+      PubliclyAccessible: yes  # Change to false in production
+      StorageEncrypted: true
+      DeletionProtection: false  # Change to true in production
+      #DeletionPolicy: Delete  # Change to Retain in production
+      MultiAZ: false  # Change to true in production
+      AllowMajorVersionUpgrade: false
+      AutoMinorVersionUpgrade: false
+      PreferredBackupWindow: !Ref DBPreferredBackupWindow
+      PreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
+      BackupRetentionPeriod: !Ref DBBackupRetentionPeriod
+      CopyTagsToSnapshot: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-rds-instance"
+        - Key: Stack
+          Value: !Ref StackName
+
+Outputs:
+  SecretArn:
+    Description: The ARN of the Secrets Manager secret storing the master password
+    Value: !Ref RDSSecret
+
+  RDSInstanceEndpoint:
+    Description: The connection endpoint for the RDS instance
+    Value: !GetAtt RDSInstance.Endpoint.Address
+
+  RDSInstancePort:
+    Description: The connection port for the RDS instance
+    Value: !GetAtt RDSInstance.Endpoint.Port
+
+  DBName:
+    Description: The name of the RDS database
+    Value: !Sub "${ResourcesPrefix}database"
+
+  DBUsername:
+    Description: The username for the RDS database
+    Value: !Ref DBUsername
+  
+# ✅ ToDos (Best Practices)
+# 1. Enable `MultiAZ` for high availability if this is a production database.
+# 2. Use `DeletionPolicy: Retain` to prevent accidental database deletion in case of a stack deletion.
+# 3. Set `PubliclyAccessible: false` to avoid exposing the RDS instance.
+# 4. Enable `DeletionProtection: true`  to prevent accidental deletions.
+# 5. Add SecretsManager policy
+# 6. See documentation and verify how stack changes can affect the database

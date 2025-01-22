@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create ECS service
+
+Parameters:
+  VPCId:
+    Type: String
+
+  Subnets:
+    Type: String
+
+  ALB:
+    Type: String
+
+  SecurityGroup:
+    Type: String
+
+  StackName:
+    Type: String
+
+  ResourcesPrefix:
+    Type: String
+
+  ServiceName:  
+    Type: String
+
+  TargetGroupName:
+    Type: String
+
+  ContainerPort:
+    Type: Number
+
+  TargetGroupHealthCheckPath:
+    Type: String
+
+  ContainerName:
+    Type: String
+  
+  ECSCluster:
+    Type: String
+
+  TaskDefinitionArn:
+    Type: String
+
+  DesiredCount:  
+    Type: Number
+
+  HealthCheckGracePeriodSeconds:
+    Type: Number
+    Default: 60
+    MinValue: 0
+    MaxValue: 600
+    Description: Grace period in seconds before health checks determine an ECS task is unhealthy.
+
+Resources:
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${ResourcesPrefix}-${ServiceName}-tg"
+      VpcId: !Ref VPCId
+      Protocol: HTTP
+      Port: !Ref ContainerPort
+      TargetType: ip
+      HealthCheckPath: !Ref TargetGroupHealthCheckPath
+      HealthCheckProtocol: HTTP
+      HealthCheckIntervalSeconds: 30
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 2
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-${ServiceName}-tg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  ALBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ALB
+      Port: !Ref ContainerPort
+      Protocol: HTTP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn:
+    - ALBListener
+    Properties:
+      ServiceName: !Sub "${ResourcesPrefix}-${ServiceName}-service"
+      Cluster: !Ref ECSCluster
+      TaskDefinition: !Ref TaskDefinitionArn
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      HealthCheckGracePeriodSeconds: !Ref HealthCheckGracePeriodSeconds 
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets: !Split [",", !Ref Subnets]
+          SecurityGroups:
+            - !Ref SecurityGroup
+      LoadBalancers:
+        - TargetGroupArn: !Ref TargetGroup
+          ContainerName: !Ref ContainerName
+          ContainerPort: !Ref ContainerPort
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-${ServiceName}-service"
+        - Key: Stack
+          Value: !Ref StackName
+
+# ✅ ToDos (Best Practices)
+# 1. Define an `AutoScalingPolicy` to handle demand spikes and reduce costs.
+# 2. Consider enabling `stickiness` in `TargetGroup` if session persistence is required.

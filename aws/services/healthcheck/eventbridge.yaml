@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  ScheduleExpression:
+    Type: String
+
+  Subnets:
+    Type: String
+  
+  SecurityGroup:
+    Type: String
+
+  ECSCluster:
+    Type: String
+
+  TaskExecutionRoleARN:
+    Type: String
+
+  EventBridgeRoleArn:
+    Type: String
+
+  CloudWatchLogGroupName:
+    Type: String  
+
+  ResourcesPrefix:
+    Type: String
+
+  StackName:
+    Type: String
+    Default: eventbridge.yaml
+
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${ResourcesPrefix}-task"
+      Cpu: "256"
+      Memory: "512"
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref TaskExecutionRoleARN
+      ContainerDefinitions:
+        - Name: "HealthCheck"
+          Image: "302672446683.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-health-check:latest"
+          Essential: true
+          Command: ["sh", "-c", "echo 'Iniciando tarea'; sleep 120; echo 'Finalizando tarea'; exit 0"]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref CloudWatchLogGroupName
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: "ecs"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-task"
+        - Key: Stack
+          Value: !Ref StackName
+
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: !Sub "${ResourcesPrefix}-healthcheck-event-rule" 
+      ScheduleExpression: !Ref ScheduleExpression
+      State: ENABLED
+      Targets:
+        - Arn: !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:cluster/${ECSCluster}
+          Id: ECSRunTask
+          RoleArn: !Ref EventBridgeRoleArn
+          EcsParameters:
+            TaskDefinitionArn: !Ref TaskDefinition
+            LaunchType: FARGATE
+            NetworkConfiguration:
+              AwsVpcConfiguration:
+                Subnets: !Split [",", !Ref Subnets]
+                SecurityGroups:
+                  - !Ref SecurityGroup
+                AssignPublicIp: "DISABLED"
