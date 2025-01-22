@@ -57,5 +57,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         run: |
-          drift_id=$(aws cloudformation detect-stack-drift --stack-name YourStackName --query 'StackDriftDetectionId' --output text)
+          drift_id=$(aws cloudformation detect-stack-drift --stack-name stack-vwm-advanced-logistics-analytics-infrastructure --query 'StackDriftDetectionId' --output text)
           aws cloudformation describe-stack-drift-detection-status --stack-drift-detection-id $drift_id
