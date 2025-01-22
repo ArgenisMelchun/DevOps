@@ -24,11 +24,11 @@ jobs:
       # Instala dependencias
       - name: Install dependencies
         run: |
-          cd demo/frontend
+          cd demo/vue-you-did-it/frontend
           npm install
 
       # Ejecuta la revisión de calidad (lint)
       - name: Lint Vue project
         run: |
-          cd demo/frontend
+          cd demo/vue-you-did-it/frontend
           npm run lint
