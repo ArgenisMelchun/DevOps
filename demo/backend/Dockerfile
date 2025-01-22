@@ -8,8 +8,12 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 COPY app.py app.py
 
-# Instala las dependencias
-RUN pip install --no-cache-dir -r requirements.txt psycopg2-binary
+# Instala las dependencias del sistema necesarias para psycopg2
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libpq-dev \
+    && pip install --no-cache-dir -r requirements.txt psycopg2-binary \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Expone el puerto 5000
 EXPOSE 5000
