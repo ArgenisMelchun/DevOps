@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create CloudWatch LogGroup
+
+
+Parameters:
+  ResourcesPrefix:
+    Type: String
+  
+  StackName:
+    Type: String
+    Default: cloudwatch-log-group.yaml
+
+  CWLogGroupRetentionInDays:
+    Type: Number
+    Description: Number of days to retain logs in the CloudWatch LogGroup
+
+
+Resources:
+  CloudWatchLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/ecs/${ResourcesPrefix}-task"
+      RetentionInDays: !Ref CWLogGroupRetentionInDays
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-ecs-log-group"
+        - Key: Stack
+          Value: !Ref StackName
+
+Outputs:
+  CloudWatchLogGroupName:
+    Description: Name of the CloudWatch Log Group
+    Value: !Ref CloudWatchLogGroup

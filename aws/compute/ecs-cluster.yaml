@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create ECS cluster
+
+Parameters:
+  StackName:
+    Type: String
+    Default: ecs-cluster.yaml
+
+  ResourcesPrefix:
+    Type: String
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub "${ResourcesPrefix}-ecs-cluster"
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-ecs-cluster"
+        - Key: Stack
+          Value: !Ref StackName
+Outputs:
+  ECSCluster:
+    Description: ECS cluster
+    Value: !Ref ECSCluster

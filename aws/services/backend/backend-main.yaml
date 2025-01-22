@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create Backend
+
+Parameters:
+  ResourcesPrefix:
+    Type: String
+
+  TaskExecutionRoleARN:
+    Type: String
+
+  ContainerName:
+    Type: String
+
+  ContainerPort:
+    Type: Number
+
+  ECRImageRepository:
+    Type: String
+  
+  ALBDNSName:
+    Type: String
+
+  StackName:
+    Type: String
+    Default: backend.yaml
+
+  VPCId:
+    Type: String
+
+  Subnets:
+    Type: String
+
+  ALB:
+    Type: String
+
+  SecurityGroup:
+    Type: String
+
+  TargetGroupName:
+    Type: String
+
+  TargetGroupHealthCheckPath:
+    Type: String
+  
+  ECSCluster:
+    Type: String
+
+  CloudWatchLogGroupName:
+    Type: String  
+
+  BaseTemplateURLParameter:
+    Type: String
+
+  ServiceName:  
+    Type: String
+
+  DesiredCount:  
+    Type: Number
+
+  RDSInstanceEndpoint:
+    Type: String
+
+  RDSInstancePort: 
+    Type: String
+
+  DBName: 
+    Type: String
+        
+  DBSecretArn:
+    Type: String
+
+Resources:
+  BackendTaskDefinitionStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/backend/ecs-back-taskdefinition.yaml"
+      Parameters:
+        ECRImageRepository: !Ref ECRImageRepository
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ContainerPort: !Ref ContainerPort
+        ContainerName: !Ref ContainerName
+        TaskExecutionRoleARN: !Ref TaskExecutionRoleARN
+        ALBDNSName: !Ref ALBDNSName
+        StackName: !Ref StackName
+        CloudWatchLogGroupName: !Ref CloudWatchLogGroupName
+        RDSInstanceEndpoint: !Ref RDSInstanceEndpoint
+        RDSInstancePort: !Ref RDSInstancePort
+        DBName: !Ref DBName
+        DBSecretArn: !Ref DBSecretArn
+  BackendServiceStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-service.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        Subnets: !Ref Subnets
+        ALB: !Ref ALB
+        SecurityGroup: !Ref SecurityGroup
+        StackName: !Ref StackName
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ServiceName: !Ref ServiceName
+        TargetGroupName: !Ref TargetGroupName
+        ContainerPort: !Ref ContainerPort
+        TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
+        ContainerName: !Ref ContainerName
+        ECSCluster: !Ref ECSCluster
+        TaskDefinitionArn: !GetAtt BackendTaskDefinitionStack.Outputs.TaskDefinitionArn
+        DesiredCount: !Ref DesiredCount

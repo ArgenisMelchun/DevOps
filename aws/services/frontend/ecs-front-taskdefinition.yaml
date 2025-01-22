@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: ECS service
+
+Parameters:
+  ResourcesPrefix:
+    Type: String
+
+  TaskExecutionRoleARN:
+    Type: String
+
+  ContainerName:
+    Type: String
+
+  ContainerPort:
+    Type: Number
+
+  ECRImageRepository:
+    Type: String
+  
+  ALBDNSName:
+    Type: String
+
+  StackName:
+    Type: String
+
+  CloudWatchLogGroupName:
+    Type: String  
+
+Resources:
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${ResourcesPrefix}-task"
+      RequiresCompatibilities:
+        - FARGATE
+      Cpu: "256" # 0.25 vCPU
+      Memory: "512" # 512 MB
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !Ref TaskExecutionRoleARN
+      ContainerDefinitions:
+        - Name: !Ref ContainerName
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ECRImageRepository}"
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+          Essential: true
+          Environment: 
+            - Name: "VITE_API_HOST"
+              Value: !Sub "http://${ALBDNSName}:5000"
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref CloudWatchLogGroupName
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-task"
+        - Key: Stack
+          Value: !Ref StackName
+
+Outputs:
+  TaskDefinitionArn:
+    Description: ARN de la Task Definition
+    Value: !Ref TaskDefinition
+
+
+# ✅ ToDos 
+# 1. Define `cpu` and `memory` values as CloudFormation parameters for flexibility.
+# 2. Consider adding `HealthCheck` settings in the container definition.
+# 3. Use `secretsManager` for environment variables instead of hardcoding sensitive values.

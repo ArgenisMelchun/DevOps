@@ -1,0 +1,239 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create Security Groups
+
+Parameters:
+  VPCId:
+    Type: String
+
+  StackName:
+    Type: String
+    Default: sg.yaml
+
+  ResourcesPrefix:
+    Type: String
+
+Resources:
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Application Load Balancer
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-alb-sg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  FrontendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for frontend ECS tasks in public subnet
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-frontend-sg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  BackendSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for backend ECS tasks
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-backend-sg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for RDS database
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-database-sg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  VPCEndpointsSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for VPC Endpoints
+      VpcId: !Ref VPCId
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-vpce-sg"
+        - Key: Stack
+          Value: !Ref StackName
+
+
+  ALBIngress80:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      CidrIp: 0.0.0.0/0
+      Description: Allow HTTP traffic from the internet
+
+
+  ALBIngress5000:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5000
+      ToPort: 5000
+      CidrIp: 0.0.0.0/0
+      Description: Allow HTTP traffic from the internet
+
+ 
+  ALBIngress5001:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5001
+      ToPort: 5001
+      CidrIp: 0.0.0.0/0
+      Description: Allow HTTP traffic from the internet
+
+  FrontendIngress80:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref FrontendSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !Ref ALBSecurityGroup
+      Description: Allow inbound HTTP traffic from the ALB
+
+  BackendIngress5000FromALB:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5000
+      ToPort: 5000
+      SourceSecurityGroupId: !Ref ALBSecurityGroup
+      Description: Allow inbound traffic from the ALB on port 5000
+
+  BackendIngress5001FromALB:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5001
+      ToPort: 5001
+      SourceSecurityGroupId: !Ref ALBSecurityGroup
+      Description: Allow inbound traffic from the ALB on port 5001
+
+  DatabaseIngress5432:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref DatabaseSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      SourceSecurityGroupId: !Ref BackendSecurityGroup
+      Description: Allow inbound traffic from the backend ECS service
+
+  DatabaseIngressAll:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref DatabaseSecurityGroup
+      IpProtocol: tcp
+      FromPort: 5432
+      ToPort: 5432
+      CidrIp: 0.0.0.0/0
+      Description: Allow inbound traffic from the internet
+
+  VPCEndpointsIngressFrontend: 
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref VPCEndpointsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      SourceSecurityGroupId: !Ref FrontendSecurityGroup
+      Description: Allow inbound traffic from the frontend ECS service
+
+  VPCEndpointsIngressBackend:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref VPCEndpointsSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      SourceSecurityGroupId: !Ref BackendSecurityGroup
+      Description: Allow inbound traffic from the backend ECS service
+
+  ALBEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+      Description: Allow all outbound traffic
+
+  FrontendEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref FrontendSecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+      Description: Allow all outbound traffic
+
+  BackendEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref BackendSecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+      Description: Allow all outbound traffic
+
+  DatabaseEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref DatabaseSecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+      Description: Allow all outbound traffic
+
+  VPCEndpointsEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      GroupId: !Ref VPCEndpointsSecurityGroup
+      IpProtocol: -1
+      CidrIp: 0.0.0.0/0
+      Description: Allow all outbound traffic
+
+Outputs:
+  ALBSecurityGroup:
+    Description: Security group for the ALB
+    Value: !Ref ALBSecurityGroup
+
+  FrontendSecurityGroup:
+    Description: Security group for the frontend ECS service
+    Value: !Ref FrontendSecurityGroup
+
+  BackendSecurityGroup:
+    Description: Security group for the backend ECS service
+    Value: !Ref BackendSecurityGroup
+
+  DatabaseSecurityGroup:
+    Description: Security group for the RDS instance
+    Value: !Ref DatabaseSecurityGroup
+
+  VPCEndpointsSecurityGroup:
+    Description: Security group for VPC Endpoints
+    Value: !Ref VPCEndpointsSecurityGroup
+
+# ⚠️ ToDos
+# 1. Remove `DatabaseIngressAll` rule.
+#    ❌ The database should never be publicly accessible from `0.0.0.0/0`.
+# 2. Restrict `Ingress` traffic to specific ports and secure IP ranges.
+#    Use CIDR blocks with limited scope instead of `0.0.0.0/0` when possible.

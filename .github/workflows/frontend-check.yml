@@ -1,0 +1,34 @@
+name: Vue Frontend Check
+
+on:
+  push:
+    paths:
+      - 'demo/frontend/**'
+  workflow_dispatch: # Permite ejecutar el workflow de manera manual
+
+jobs:
+  check-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Configura el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Configura Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Reemplaza con la versión de Node.js que uses
+
+      # Instala dependencias
+      - name: Install dependencies
+        run: |
+          cd demo/frontend/vue-you-did-it
+          npm install
+
+      # Ejecuta la revisión de calidad (lint)
+      - name: Lint Vue project
+        run: |
+          cd demo/frontend/vue-you-did-it
+          npm run lint
