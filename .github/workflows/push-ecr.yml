@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
+      # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up AWS credentials
+      # Step 2: Configure AWS credentials
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -22,22 +22,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # Log in to Amazon ECR
+      # Step 3: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 302672446683.dkr.ecr.us-east-1.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
 
-      # Build Docker image
-      - name: Build Docker image
+      # Step 4: Build and Push Frontend
+      - name: Build and Push Frontend
         run: |
           docker build -t vwm-advanced-logistics-analytics-infrastructure-frontend demo/frontend/vue-you-did-it/
+          docker tag vwm-advanced-logistics-analytics-infrastructure-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}
 
-      # Tag Docker image
-      - name: Tag Docker image
+      # Step 5: Build and Push Backend
+      - name: Build and Push Backend
         run: |
-          docker tag vwm-advanced-logistics-analytics-infrastructure-frontend:latest 302672446683.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}
-
-      # Push Docker image to ECR
-      - name: Push to Amazon ECR
-        run: |
-          docker push 302672446683.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}
+          docker build -t vwm-advanced-logistics-analytics-infrastructure-backend demo/backend/
+          docker tag vwm-advanced-logistics-analytics-infrastructure-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
