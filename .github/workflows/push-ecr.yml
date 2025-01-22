@@ -47,30 +47,50 @@ jobs:
           docker tag vwm-advanced-logistics-analytics-infrastructure-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
 
-      # Step 6: Scan Frontend Image in ECR
-      - name: Scan Frontend Image
+      # Step 6: Scan Frontend Image and Wait
+      - name: Scan and Wait for Frontend Image
         run: |
-          aws ecr start-image-scan \
-            --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
-            --image-id imageTag=${{ github.ref_name }}
-
-      # Step 7: Scan Backend Image in ECR
-      - name: Scan Backend Image
-        run: |
-          aws ecr start-image-scan \
-            --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
-            --image-id imageTag=${{ github.ref_name }}
-
-      # Step 8: Wait and Describe Scan Results for Frontend
-      - name: Get Scan Results for Frontend
-        run: |
+          aws ecr start-image-scan --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend --image-id imageTag=${{ github.ref_name }}
+          for i in {1..10}; do
+            status=$(aws ecr describe-image-scan-findings \
+              --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
+              --image-id imageTag=${{ github.ref_name }} \
+              --query "imageScanStatus.status" --output text)
+            if [[ "$status" == "COMPLETE" ]]; then
+              echo "Frontend image scan completed."
+              break
+            elif [[ "$status" == "FAILED" ]]; then
+              echo "Frontend image scan failed."
+              exit 1
+            else
+              echo "Frontend image scan in progress. Retrying in 10 seconds..."
+              sleep 10
+            fi
+          done
           aws ecr describe-image-scan-findings \
             --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
             --image-id imageTag=${{ github.ref_name }}
 
-      # Step 9: Wait and Describe Scan Results for Backend
-      - name: Get Scan Results for Backend
+      # Step 7: Scan Backend Image and Wait
+      - name: Scan and Wait for Backend Image
         run: |
+          aws ecr start-image-scan --repository-name vwm-advanced-logistics-analytics-infrastructure-backend --image-id imageTag=${{ github.ref_name }}
+          for i in {1..10}; do
+            status=$(aws ecr describe-image-scan-findings \
+              --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
+              --image-id imageTag=${{ github.ref_name }} \
+              --query "imageScanStatus.status" --output text)
+            if [[ "$status" == "COMPLETE" ]]; then
+              echo "Backend image scan completed."
+              break
+            elif [[ "$status" == "FAILED" ]]; then
+              echo "Backend image scan failed."
+              exit 1
+            else
+              echo "Backend image scan in progress. Retrying in 10 seconds..."
+              sleep 10
+            fi
+          done
           aws ecr describe-image-scan-findings \
             --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
             --image-id imageTag=${{ github.ref_name }}
