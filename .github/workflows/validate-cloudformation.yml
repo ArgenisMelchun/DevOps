@@ -1,0 +1,58 @@
+name: Validate and Drift CloudFormation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - aws/**  # Trigger only if changes occur in the /aws/ directory
+
+jobs:
+  validate-and-drift:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Step 3: Set permissions for the upload script
+      - name: Set permissions for upload script
+        run: chmod +x aws/scripts/upload-to-s3.sh
+
+      # Step 4: Upload CloudFormation templates to S3
+      - name: Upload files to S3
+        env:
+          S3_BUCKET: stack-vwm-advanced-logistics-analytics-infrastructure
+        run: aws/scripts/upload-to-s3.sh
+
+      # Step 5: Install dependencies for linting and validation
+      - name: Install CloudFormation tools
+        run: |
+          pip install cfn-lint
+          gem install cfn-nag
+
+      # Step 6: Lint and validate the main CloudFormation template
+      - name: Lint and validate CloudFormation
+        run: |
+          cfn-lint aws/main-template.yaml
+          aws cloudformation validate-template \
+            --template-url https://s3.amazonaws.com/stack-vwm-advanced-logistics-analytics-infrastructure/main-template.yaml
+
+      # Step 7: Check for drift detection
+      - name: Detect stack drift
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+        run: |
+          drift_id=$(aws cloudformation detect-stack-drift --stack-name YourStackName --query 'StackDriftDetectionId' --output text)
+          aws cloudformation describe-stack-drift-detection-status --stack-drift-detection-id $drift_id
