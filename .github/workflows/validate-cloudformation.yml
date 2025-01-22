@@ -3,7 +3,7 @@ name: Validate and Drift CloudFormation
 on:
   push:
     branches:
-      - main
+      - '**'
     paths:
       - aws/**  # Trigger only if changes occur in the /aws/ directory
 
