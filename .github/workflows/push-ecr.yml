@@ -1,6 +1,12 @@
 name: Build and Push to ECR
 
 on:
+  workflow_run:
+    workflows: 
+      - "Python Backend Check"
+      - "Vue Frontend Check"
+    types:
+      - completed
   push:
     tags:
       - '*' # Trigger on every tag push
