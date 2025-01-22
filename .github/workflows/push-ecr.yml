@@ -1,14 +1,143 @@
 name: Build and Push to ECR
 
 on:
+  workflow_run:
+    workflows: 
+      - "Python Backend Check"
+      - "Vue Frontend Check"
+    types:
+      - completed
   push:
     tags:
       - '*' # Trigger on every tag push
   workflow_dispatch: # Allows manual execution of the workflow
 
 jobs:
+  check-python-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r demo/backend/requirements.txt
+
+      # Step 4: Run and Test Backend
+      - name: Run and Test Backend
+        run: |
+          python demo/backend/app.py &
+          sleep 5
+          curl -f http://127.0.0.1:5000/health
+          curl -f http://127.0.0.1:5000/DummyWeatherForecast
+
+  check-vue-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Replace with the version of Node.js you are using
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          cd demo/frontend/vue-you-did-it
+          npm install
+
+      # Step 4: Lint Vue project
+      - name: Lint Vue project
+        run: |
+          cd demo/frontend/vue-you-did-it
+          npm run lint
+
+  build-and-push:
+    needs: [check-python-backend, check-vue-frontend] # Ensures both checks are completed first
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Step 3: Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+
+      # Step 4: Build and Push Frontend Docker image
+      - name: Build and Push Frontend
+        run: |
+          docker build -t vwm-advanced-logistics-analytics-infrastructure-frontend demo/frontend/vue-you-did-it/
+          docker tag vwm-advanced-logistics-analytics-infrastructure-frontend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-frontend:${{ github.ref_name }}
+
+      # Step 5: Build and Push Backend Docker image
+      - name: Build and Push Backend
+        run: |
+          docker build -t vwm-advanced-logistics-analytics-infrastructure-backend demo/backend/
+          docker tag vwm-advanced-logistics-analytics-infrastructure-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
+
+      # Step 6: Scan and wait for Frontend Docker image
+      - name: Scan and Wait for Frontend Image
+        run: |
+          aws ecr start-image-scan --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend --image-id imageTag=${{ github.ref_name }}
+          for i in {1..30}; do # Up to 5 minutes (30 attempts x 10 seconds)
+            status=$(aws ecr describe-image-scan-findings \
+              --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
+              --image-id imageTag=${{ github.ref_name }} \
+              --query "imageScanStatus.status" --output text 2>/dev/null || echo "ERROR")
+            
+            if [[ "$status" == "COMPLETE" ]]; then
+              echo "Frontend image scan completed."
+              break
+            elif [[ "$status" == "FAILED" ]]; then
+              echo "Frontend image scan failed."
+              exit 1
+            elif [[ "$status" == "ERROR" ]]; then
+              echo "Frontend image scan in progress. Retrying in 10 seconds..."
+            else
+              echo "Frontend image scan in progress. Retrying in 10 seconds..."
+            fi
+            sleep 10
+          done
+          
+          if [[ "$status" != "COMPLETE" ]]; then
+            echo "Frontend image scan did not complete within the expected time."
+            exit 1
+          fi
+
+          aws ecr describe-image-scan-findings \
+            --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
+            --image-id imageTag=${{ github.ref_name }}
+
   cloudformation-stack:
-#    needs: [build-and-push]
+    needs: [build-and-push]
     runs-on: ubuntu-latest
 
     steps:
