@@ -1,0 +1,36 @@
+name: Python Backend Build Check
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+  workflow_dispatch:
+
+jobs:
+  python-backend-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r demo/backend/requirements.txt
+
+      # Run the application and test endpoints
+      - name: Run and Test Backend
+        run: |
+          python demo/backend/app.py &
+          sleep 5
+          curl -f http://127.0.0.1:5000/health
+          curl -f http://127.0.0.1:5000/DummyWeatherForecast
