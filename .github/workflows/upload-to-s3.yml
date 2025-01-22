@@ -1,4 +1,4 @@
-name: Upload to S3
+name: Upload to S3 and Deploy CloudFormation
 
 on:
   push:
@@ -6,24 +6,51 @@ on:
       - main  # Trigger this workflow on pushes to the 'main' branch
 
 jobs:
-  upload:
+  upload-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    # Step 2: Configure AWS credentials
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v3
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1  # Update with your AWS region
+        aws-region: us-east-1
 
-    - name: Set up permissions for the script
+    # Step 3: Set up permissions for the script
+    - name: Set up permissions for the upload script
       run: chmod +x aws/scripts/upload-to-s3.sh
 
+    # Step 4: Upload files to S3
     - name: Upload files to S3
       env:
         S3_BUCKET: stack-vwm-advanced-logistics-analytics-infrastructure
       run: aws/scripts/upload-to-s3.sh
+
+    # Step 5: Deploy or update CloudFormation stack
+    - name: Deploy CloudFormation Stack
+      run: |
+        STACK_NAME="stack-vwm-advanced-logistics-analytics-infrastructure"
+        TEMPLATE_URL="https://stack-vwm-advanced-logistics-analytics-infrastructure.s3.amazonaws.com/main.yaml"
+
+        echo "Checking if stack $STACK_NAME exists..."
+        if aws cloudformation describe-stacks --stack-name "$STACK_NAME" > /dev/null 2>&1; then
+          echo "Stack exists. Updating..."
+          aws cloudformation update-stack --stack-name "$STACK_NAME" \
+            --template-url "$TEMPLATE_URL" \
+            --capabilities CAPABILITY_NAMED_IAM
+        else
+          echo "Stack does not exist. Creating..."
+          aws cloudformation create-stack --stack-name "$STACK_NAME" \
+            --template-url "$TEMPLATE_URL" \
+            --capabilities CAPABILITY_NAMED_IAM
+        fi
+
+        echo "Waiting for the stack operation to complete..."
+        aws cloudformation wait stack-update-complete --stack-name "$STACK_NAME" || aws cloudformation wait stack-create-complete --stack-name "$STACK_NAME"
+        echo "Stack operation completed successfully."

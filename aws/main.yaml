@@ -170,3 +170,13 @@ Resources:
       Parameters:
         VPCId: !Ref VPCId
         ResourcesPrefix: !Ref ResourcesPrefix
+  EndPointStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PrivateSubnets: !Ref PrivateSubnets
+        RouteTables: !Ref RouteTables
+        VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
