@@ -2,6 +2,8 @@ name: Vue Frontend Check
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'demo/frontend/**'
   workflow_dispatch: # Permite ejecutar el workflow de manera manual

@@ -2,6 +2,8 @@ name: Python Backend Check
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - 'demo/backend/**'
   workflow_dispatch:
