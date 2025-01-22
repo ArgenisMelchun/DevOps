@@ -10,7 +10,7 @@ on:
   push:
     tags:
       - '*' # Trigger on every tag push
-
+jobs:
  build-and-push:
     needs: [check-python-backend, check-vue-frontend] # Ensures both checks are completed first
     runs-on: ubuntu-latest
