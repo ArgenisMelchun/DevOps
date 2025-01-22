@@ -1,6 +1,12 @@
 name: Build and Push to ECR
 
 on:
+  workflow_run:
+    workflows: 
+      - "Python Backend Check"
+      - "Vue Frontend Check"
+    types:
+      - completed
   push:
     tags:
       - '*' # Trigger on every tag push
@@ -40,3 +46,31 @@ jobs:
           docker build -t vwm-advanced-logistics-analytics-infrastructure-backend demo/backend/
           docker tag vwm-advanced-logistics-analytics-infrastructure-backend:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-backend:${{ github.ref_name }}
+
+      # Step 6: Scan Frontend Image in ECR
+      - name: Scan Frontend Image
+        run: |
+          aws ecr start-image-scan \
+            --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
+            --image-id imageTag=${{ github.ref_name }}
+
+      # Step 7: Scan Backend Image in ECR
+      - name: Scan Backend Image
+        run: |
+          aws ecr start-image-scan \
+            --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
+            --image-id imageTag=${{ github.ref_name }}
+
+      # Step 8: Wait and Describe Scan Results for Frontend
+      - name: Get Scan Results for Frontend
+        run: |
+          aws ecr describe-image-scan-findings \
+            --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
+            --image-id imageTag=${{ github.ref_name }}
+
+      # Step 9: Wait and Describe Scan Results for Backend
+      - name: Get Scan Results for Backend
+        run: |
+          aws ecr describe-image-scan-findings \
+            --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
+            --image-id imageTag=${{ github.ref_name }}
