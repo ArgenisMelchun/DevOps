@@ -3,7 +3,7 @@ name: Python Backend Build Check
 on:
   push:
     paths:
-      - 'backend/**'
+      - 'demo/backend/**'
   workflow_dispatch:
 
 jobs:
