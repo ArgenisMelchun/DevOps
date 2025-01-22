@@ -44,15 +44,15 @@ def weather_forecast():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route("/DummyWeatherForecast")
-def dummy_weather_forecast():
-    # Servicio independiente para valores dummy
-    dummy_forecasts = [
-        {"date": "2025-01-21", "temperatureC": 20, "summary": "Sunny"},
-        {"date": "2025-01-22", "temperatureC": 18, "summary": "Cloudy"},
-        {"date": "2025-01-23", "temperatureC": 15, "summary": "Rainy"},
-    ]
-    return jsonify(dummy_forecasts), 200
+#@app.route("/DummyWeatherForecast")
+#def dummy_weather_forecast():
+#    # Servicio independiente para valores dummy
+#    dummy_forecasts = [
+#        {"date": "2025-01-21", "temperatureC": 20, "summary": "Sunny"},
+#        {"date": "2025-01-22", "temperatureC": 18, "summary": "Cloudy"},
+#        {"date": "2025-01-23", "temperatureC": 15, "summary": "Rainy"},
+#    ]
+#    return jsonify(dummy_forecasts), 200
 
 @app.route("/environment")
 def environment_variables():
