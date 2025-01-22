@@ -30,7 +30,7 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t vwm-advanced-logistics-analytics-infrastructure-frontend .
+          docker build -t vwm-advanced-logistics-analytics-infrastructure-frontend demo/frontend/vue-you-did-it/
 
       # Tag Docker image
       - name: Tag Docker image
