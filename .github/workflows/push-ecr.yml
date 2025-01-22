@@ -136,35 +136,70 @@ jobs:
             --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
             --image-id imageTag=${{ github.ref_name }}
 
-      # Step 7: Scan and wait for Backend Docker image
-      - name: Scan and Wait for Backend Image
+  cloudformation-stack:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      # Step 2: Validate and Deploy CloudFormation Stack
+      - name: Deploy CloudFormation Stack
         run: |
-          aws ecr start-image-scan --repository-name vwm-advanced-logistics-analytics-infrastructure-backend --image-id imageTag=${{ github.ref_name }}
-          for i in {1..120}; do # Up to 20 minutes (120 attempts x 10 seconds)
-            status=$(aws ecr describe-image-scan-findings \
-              --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
-              --image-id imageTag=${{ github.ref_name }} \
-              --query "imageScanStatus.status" --output text 2>/dev/null || echo "ERROR")
-            
-            if [[ "$status" == "COMPLETE" ]]; then
-              echo "Backend image scan completed."
-              break
-            elif [[ "$status" == "FAILED" ]]; then
-              echo "Backend image scan failed."
-              exit 1
-            elif [[ "$status" == "ERROR" ]]; then
-              echo "Backend image scan in progress. Retrying in 10 seconds..."
-            else
-              echo "Backend image scan in progress. Retrying in 10 seconds..."
-            fi
-            sleep 10
-          done
-          
-          if [[ "$status" != "COMPLETE" ]]; then
-            echo "Backend image scan did not complete within the expected time."
-            exit 1
+          STACK_NAME="stack-vwm-advanced-logistics-analytics-infrastructure-parameters"
+          TEMPLATE_BODY="file://cloudformation-template.yaml"
+          PARAMETERS="ParameterKey=BackendContainerName,ParameterValue=BackContainer \
+            ParameterKey=BackendContainerPort,ParameterValue=5000 \
+            ParameterKey=BackendImageRepository,ParameterValue=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-backend:${{ github.ref_name }} \
+            ParameterKey=BackendServiceName,ParameterValue=backend \
+            ParameterKey=BackendTargetGroupName,ParameterValue=backend-tg \
+            ParameterKey=BaseTemplateURL,ParameterValue=https://stack-vwm-advanced-logistics-analytics-infrastructure \
+            ParameterKey=CWLogGroupRetentionInDays,ParameterValue=30 \
+            ParameterKey=DBBackupRetentionPeriod,ParameterValue=7 \
+            ParameterKey=DBInstanceClass,ParameterValue=db.t3.micro \
+            ParameterKey=DBPreferredBackupWindow,ParameterValue=07:00-08:00 \
+            ParameterKey=DBPreferredMaintenanceWindow,ParameterValue=sun:08:00-sun:09:00 \
+            ParameterKey=DBUsername,ParameterValue=postgres \
+            ParameterKey=DesiredCount,ParameterValue=1 \
+            ParameterKey=FrontendContainerName,ParameterValue=FrontendContainer \
+            ParameterKey=FrontendContainerPort,ParameterValue=80 \
+            ParameterKey=FrontendImageRepository,ParameterValue=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-frontend:${{ github.ref_name }} \
+            ParameterKey=FrontendTargetGroupName,ParameterValue=frontend-tg \
+            ParameterKey=HealthCheckImageRepository,ParameterValue=vwm-advanced-logistics-analytics-infrastructure-health-check:latest \
+            ParameterKey=MLContainerName,ParameterValue=MLContainer \
+            ParameterKey=MLContainerPort,ParameterValue=5001 \
+            ParameterKey=MLImageRepository,ParameterValue=vwm-advanced-logistics-analytics-infrastructure-ml:latest \
+            ParameterKey=MLServiceName,ParameterValue=ml \
+            ParameterKey=MLTargetGroupName,ParameterValue=ml-tg \
+            ParameterKey=PrivateSubnets,ParameterValue=subnet-08a0555180cf67442,subnet-00430cfa34f8399ba,subnet-013cc38f635924ec5,subnet-0c300200230fb9e75,subnet-0a516704a7f663adb,subnet-09c68d061519dc742 \
+            ParameterKey=PublicSubnets,ParameterValue=subnet-037029409ebf2e40a,subnet-02d3b1f7781083329,subnet-04b8975560e504362,subnet-0bc409e74d3daace3,subnet-0f84440d859dff00a,subnet-0c2415ce936583b0f \
+            ParameterKey=ResourcesPrefix,ParameterValue=vwm \
+            ParameterKey=RouteTables,ParameterValue=rtb-02ca366497a9244f4,rtb-0e902c3c1527e37d9,rtb-0d9e2f241a061eb18 \
+            ParameterKey=ScheduleExpression,ParameterValue=cron(0 0 1 */4 ? *) \
+            ParameterKey=ServiceName,ParameterValue=frontend \
+            ParameterKey=TargetGroupHealthCheckPath,ParameterValue=/health \
+            ParameterKey=VPCId,ParameterValue=vpc-0e47b3aad6a2663ce"
+
+          if aws cloudformation describe-stacks --stack-name "$STACK_NAME" > /dev/null 2>&1; then
+            echo "Stack exists. Updating..."
+            aws cloudformation update-stack --stack-name "$STACK_NAME" \
+              --template-body "$TEMPLATE_BODY" \
+              --parameters $PARAMETERS \
+              --capabilities CAPABILITY_NAMED_IAM
+          else
+            echo "Stack does not exist. Creating..."
+            aws cloudformation create-stack --stack-name "$STACK_NAME" \
+              --template-body "$TEMPLATE_BODY" \
+              --parameters $PARAMETERS \
+              --capabilities CAPABILITY_NAMED_IAM
           fi
 
-          aws ecr describe-image-scan-findings \
-            --repository-name vwm-advanced-logistics-analytics-infrastructure-backend \
-            --image-id imageTag=${{ github.ref_name }}
+          echo "Waiting for the stack operation to complete..."
+          aws cloudformation wait stack-update-complete --stack-name "$STACK_NAME" || aws cloudformation wait stack-create-complete --stack-name "$STACK_NAME"
+          echo "Stack operation completed successfully."
