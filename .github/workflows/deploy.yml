@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # Trigger this workflow on pushes to the 'main' branch
+  workflow_dispatch: # Permite ejecutar el workflow de manera manual
 
 jobs:
   upload-and-deploy:
