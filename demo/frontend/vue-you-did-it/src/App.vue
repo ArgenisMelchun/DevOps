@@ -36,9 +36,9 @@ onMounted(() => {
   </div>
   <HelloWorld msg="Vite + Vue" />
   
-  <!-- Nueva sección para mostrar los datos del clima -->
+  <!-- New section -->
   <div>
-    <h2>Weather Forecast 2</h2>
+    <h2>Weather Forecast</h2>
     <ul>
       <li v-for="(forecast, index) in weatherData" :key="index">
         <strong>{{ forecast.date }}</strong>: 
