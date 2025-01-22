@@ -136,7 +136,7 @@ jobs:
             --repository-name vwm-advanced-logistics-analytics-infrastructure-frontend \
             --image-id imageTag=${{ github.ref_name }}
 
-  cloudformation-stack:
+  cloudformation-parameters-stack:
     needs: [build-and-push]
     runs-on: ubuntu-latest
 
@@ -153,7 +153,7 @@ jobs:
       - name: Deploy CloudFormation Stack
         run: |
           STACK_NAME="stack-vwm-advanced-logistics-analytics-infrastructure-parameters"
-          TEMPLATE_BODY="file://cloudformation-template.yaml"
+          TEMPLATE_BODY="file://aws/parameters/ssm-parameters.yaml"
           PARAMETERS="ParameterKey=BackendContainerName,ParameterValue=BackContainer \
             ParameterKey=BackendContainerPort,ParameterValue=5000 \
             ParameterKey=BackendImageRepository,ParameterValue=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/vwm-backend:${{ github.ref_name }} \
