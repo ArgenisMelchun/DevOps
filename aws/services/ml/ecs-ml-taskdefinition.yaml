@@ -38,6 +38,12 @@ Parameters:
   DBSecretArn:
     Type: String
 
+  TaskCpu:
+    Type: String
+
+  TaskMemory:
+    Type: Stringk
+
 Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -45,8 +51,8 @@ Resources:
       Family: !Sub "${ResourcesPrefix}-task"
       RequiresCompatibilities:
         - FARGATE
-      Cpu: "256" # 0.25 vCPU
-      Memory: "512" # 512 MB
+      Cpu: !Ref TaskCpu
+      Memory: !Ref TaskMemory
       NetworkMode: awsvpc
       ExecutionRoleArn: !Ref TaskExecutionRoleARN
       ContainerDefinitions:

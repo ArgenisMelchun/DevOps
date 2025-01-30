@@ -57,6 +57,12 @@ Parameters:
   DesiredCount:  
     Type: Number
 
+  TaskCpu:
+    Type: String
+
+  TaskMemory:
+    Type: String
+
 Resources:
   FrontendTaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
@@ -71,6 +77,8 @@ Resources:
         ALBDNSName: !Ref ALBDNSName
         StackName: !Ref StackName
         CloudWatchLogGroupName: !Ref CloudWatchLogGroupName
+        TaskCpu: !Ref TaskCpu
+        TaskMemory: !Ref TaskMemory
   FrontendServiceStack:
     Type: AWS::CloudFormation::Stack
     Properties:

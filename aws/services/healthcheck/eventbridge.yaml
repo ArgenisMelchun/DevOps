@@ -28,20 +28,29 @@ Parameters:
     Type: String
     Default: eventbridge.yaml
 
+  TaskCpu:
+    Type: String
+
+  TaskMemory:
+    Type: Stringk
+
+  HealthCheckImageRepository:
+    Type: String
+
 Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: !Sub "${ResourcesPrefix}-task"
-      Cpu: "256"
-      Memory: "512"
+      Cpu: !Ref TaskCpu
+      Memory: !Ref TaskMemory
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - FARGATE
       ExecutionRoleArn: !Ref TaskExecutionRoleARN
       ContainerDefinitions:
         - Name: "HealthCheck"
-          Image: "302672446683.dkr.ecr.us-east-1.amazonaws.com/vwm-advanced-logistics-analytics-infrastructure-health-check:latest"
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${HealthCheckImageRepository}"
           Essential: true
           Command: ["sh", "-c", "echo 'Iniciando tarea'; sleep 120; echo 'Finalizando tarea'; exit 0"]
           LogConfiguration:
