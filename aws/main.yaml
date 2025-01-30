@@ -363,3 +363,4 @@ Resources:
         ResourcesPrefix: !Ref ResourcesPrefix
         HealthCheckImageRepository: !Ref HealthCheckImageRepository
         TaskCpu: !Ref HealthCheckTaskCpu
+        TaskMemory: !Ref HealthCheckTaskMemory
