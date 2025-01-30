@@ -69,6 +69,12 @@ Parameters:
   DBSecretArn:
     Type: String
 
+  TaskCpu:
+    Type: String
+
+  TaskMemory:
+    Type: String
+
 Resources:
   BackendTaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
@@ -87,6 +93,8 @@ Resources:
         RDSInstancePort: !Ref RDSInstancePort
         DBName: !Ref DBName
         DBSecretArn: !Ref DBSecretArn
+        TaskCpu: !Ref TaskCpu
+        TaskMemory: !Ref TaskMemory
   BackendServiceStack:
     Type: AWS::CloudFormation::Stack
     Properties:

@@ -162,6 +162,46 @@ Parameters:
     Default: /vwm-infrastructure/ScheduleExpression
     Description: The schedule expression for the EventBridge rule
 
+  FrontendTaskCpu:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/FrontendTaskCpu
+    Description: "The number of CPU units used by the frontend task"
+
+  FrontendTaskMemory:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/FrontendTaskMemory
+    Description: "The amount of memory (in MiB) used by the frontend task"
+
+  BackendTaskCpu:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/BackendTaskCpu
+    Description: "The number of CPU units used by the backend task"
+
+  BackendTaskMemory:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/BackendTaskMemory
+    Description: "The amount of memory (in MiB) used by the backend task"
+
+  HealthCheckTaskCpu:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/HealthCheckTaskCpu
+    Description: "The number of CPU units used by the health check task"
+
+  HealthCheckTaskMemory:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/HealthCheckTaskMemory
+    Description: "The amount of memory (in MiB) used by the health check task"
+
+  MLTaskCpu:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/MLTaskCpu
+    Description: "The number of CPU units used by the ML task"
+
+  MLTaskMemory:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/MLTaskMemory
+    Description: "The amount of memory (in MiB) used by the ML task"
+
 Resources:
   SGStack:
     Type: AWS::CloudFormation::Stack
@@ -247,6 +287,8 @@ Resources:
         BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
         ServiceName: !Ref ServiceName
         DesiredCount: !Ref DesiredCount
+        TaskCpu: !Ref FrontendTaskCpu
+        TaskMemory: !Ref FrontendTaskMemory
   BackendStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: EndPointStack
@@ -274,6 +316,8 @@ Resources:
         RDSInstancePort: !GetAtt RDSStack.Outputs.RDSInstancePort
         DBName: !GetAtt RDSStack.Outputs.DBName
         DBSecretArn: !GetAtt RDSStack.Outputs.SecretArn
+        TaskCpu: !Ref BackendTaskCpu
+        TaskMemory: !Ref BackendTaskMemory
   MLStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: EndPointStack
@@ -301,17 +345,21 @@ Resources:
         ContainerPort: !Ref MLContainerPort
         ServiceName: !Ref MLServiceName
         ContainerName: !Ref MLContainerName
-#  HealthCheckStack:
-#    Type: AWS::CloudFormation::Stack
-#    DependsOn: EndPointStack
-#    Properties:
-#      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/healthcheck/eventbridge.yaml"
-#      Parameters:
-#        Subnets: !Ref PrivateSubnets
-#        SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
-#        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-#        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-#        EventBridgeRoleArn: !GetAtt RoleStack.Outputs.EventBridgeRoleArn
-#        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-#        ScheduleExpression: !Ref ScheduleExpression
-#        ResourcesPrefix: !Ref ResourcesPrefix
+        TaskCpu: !Ref MLTaskCpu
+        TaskMemory: !Ref MLTaskMemory
+  HealthCheckStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/healthcheck/eventbridge.yaml"
+      Parameters:
+        Subnets: !Ref PrivateSubnets
+        SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        EventBridgeRoleArn: !GetAtt RoleStack.Outputs.EventBridgeRoleArn
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        ScheduleExpression: !Ref ScheduleExpression
+        ResourcesPrefix: !Ref ResourcesPrefix
+        HealthCheckImageRepository: !Ref HealthCheckImageRepository
+        TaskCpu: !Ref HealthCheckTaskCpu
