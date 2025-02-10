@@ -203,7 +203,8 @@ Parameters:
     Description: "The amount of memory (in MiB) used by the ML task"
 
   EmailEndpoint:
-    Type: String
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/EmailEndpoint
     Description: Email address for the SNS topic subscription
 
 Resources:
