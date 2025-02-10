@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Stack to create Network Load Balancer in front of Application Load Balancer
+
+Parameters:
+  VPCId:
+    Default: "vpc-12345678"
+    Type: String
+
+  Subnets:
+    Default: subnet-037029409ebf2e40a,subnet-02d3b1f7781083329,subnet-04b8975560e504362,subnet-0bc409e74d3daace3,subnet-0f84440d859dff00a,subnet-0c2415ce936583b0f"
+    Type: String
+
+  ALBSecurityGroup:
+    Default: "	sg-07a85aa8d8a283e31 "
+    Type: String
+
+  StackName:
+    Type: String
+    Default: alb.yaml
+
+  ResourcesPrefix:
+    Type: String
+
+Resources:
+  NLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub "${ResourcesPrefix}-nlb"
+      Scheme: internet-facing
+      Subnets: !Split [",", !Ref Subnets]
+      Type: network
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-nlb"
+        - Key: Stack
+          Value: !Ref StackName
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub "${ResourcesPrefix}-alb-tg"
+      VpcId: !Ref VPCId
+      Protocol: TCP
+      Port: 80
+      TargetType: instance
+      Targets:
+        - Id: !Ref ALB
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-alb-tg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  NLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref NLB
+      Port: 80
+      Protocol: TCP
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+
+Outputs:
+  NLB:
+    Description: Logical ID of the NLB resource
+    Value: !Ref NLB
+  
+  NLBDNSName:
+    Description: DNS Name of the NLB resource
+    Value: !GetAtt NLB.DNSName

@@ -27,7 +27,7 @@ Resources:
               SSEAlgorithm: AES256
       Tags:
           - Key: Name
-            Value: !Sub "${ResourcesPrefix}-sns"
+            Value: !Sub "${ResourcesPrefix}-s3"
           - Key: Stack
             Value: !Ref StackName
 Outputs:
