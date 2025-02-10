@@ -3,6 +3,14 @@ Parameters:
   BucketName:
     Type: String
     Description: "Name of the S3 bucket to be created"
+    
+  StackName:
+    Type: String
+    Default: s3.yaml
+
+  ResourcesPrefix:
+    Type: String
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -17,9 +25,20 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+    Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-sns"
+        - Key: Stack
+          Value: !Ref StackName
 Outputs:
   BucketName:
     Description: "Name of the S3 bucket created"
     Value: !Ref S3Bucket
     Export:
       Name: !Sub "${AWS::StackName}-BucketName"
+
+# 🔥 TODO: 
+# Add a bucket policy to restrict access to the bucket to a specific IAM role
+# Add versioning
+# Add object lock
+# Add lifecycle policy

@@ -223,8 +223,11 @@ Parameters:
 
   EmailEndpoint:
     Type: String
-    Default: ""
     Description: Email address for the SNS topic subscription
+
+  BucketName:
+    Type: String
+    Description: "Name of the S3 bucket to be created"
 
 Resources:
   ResourcesPrefixParameter:
@@ -667,3 +670,15 @@ Resources:
       Tags:
         Name: !Sub "${ResourcesPrefix}-email-endpoint-parameter"
         Stack: ssm-parameters.yaml
+
+  BucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/BucketName"
+      Type: String
+      Value: !Ref BucketName
+      Description: "Name of the S3 bucket to be created"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-bucketname-parameter"
+        Stack: ssm-parameters.yaml
+

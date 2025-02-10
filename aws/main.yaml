@@ -207,7 +207,26 @@ Parameters:
     Default: /vwm-infrastructure/EmailEndpoint
     Description: Email address for the SNS topic subscription
 
+  # BucketName:
+  #   Type: String
+  #   Default: /vwm-infrastructure/EmailEndpoint
+  #   Description: "Name of the S3 bucket to be created"
+
 Resources:
+  SNSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/sns/sns.yaml"
+      Parameters:
+        EmailEndpoint: !Ref EmailEndpoint
+        ResourcesPrefix: !Ref ResourcesPrefix
+  # S3Stack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/s3/s3.yaml"
+  #     Parameters:
+  #       BucketName: !Ref BucketName
+  #       ResourcesPrefix: !Ref ResourcesPrefix
   SGStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -262,13 +281,6 @@ Resources:
       Parameters:
         ResourcesPrefix: !Ref ResourcesPrefix
         SecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  SNSStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/sns/sns.yaml"
-      Parameters:
-        EmailEndpoint: !Ref EmailEndpoint
-        ResourcesPrefix: !Ref ResourcesPrefix
   CloudWatchLogGroupStack:
     Type: AWS::CloudFormation::Stack
     Properties:
