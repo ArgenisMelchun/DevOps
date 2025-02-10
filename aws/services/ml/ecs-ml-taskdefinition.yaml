@@ -42,7 +42,7 @@ Parameters:
     Type: String
 
   TaskMemory:
-    Type: Stringk
+    Type: String
 
 Resources:
   TaskDefinition:

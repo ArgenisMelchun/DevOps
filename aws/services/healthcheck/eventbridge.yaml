@@ -32,7 +32,7 @@ Parameters:
     Type: String
 
   TaskMemory:
-    Type: Stringk
+    Type: String
 
   HealthCheckImageRepository:
     Type: String
