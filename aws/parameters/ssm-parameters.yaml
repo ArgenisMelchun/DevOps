@@ -181,6 +181,51 @@ Parameters:
     Default: "cron(0 0 1 */4 ? *)"
     Description: The schedule expression for the EventBridge rule
 
+  FrontendTaskCpu:
+    Type: String
+    Default: 256
+    Description: "The number of CPU units used by the frontend task"
+
+  FrontendTaskMemory:
+    Type: String
+    Default: 512
+    Description: "The amount of memory (in MiB) used by the frontend task"
+
+  BackendTaskCpu:
+    Type: String
+    Default: 256
+    Description: "The number of CPU units used by the backend task"
+
+  BackendTaskMemory:
+    Type: String
+    Default: 512
+    Description: "The amount of memory (in MiB) used by the backend task"
+
+  HealthCheckTaskCpu:
+    Type: String
+    Default: 256
+    Description: "The number of CPU units used by the health check task"
+
+  HealthCheckTaskMemory:
+    Type: String
+    Default: 512
+    Description: "The amount of memory (in MiB) used by the health check task"
+
+  MLTaskCpu:
+    Type: String
+    Default: 256
+    Description: "The number of CPU units used by the ML task"
+
+  MLTaskMemory:
+    Type: String
+    Default: 512
+    Description: "The amount of memory (in MiB) used by the ML task"
+
+  EmailEndpoint:
+    Type: String
+    Default: ""
+    Description: Email address for the SNS topic subscription
+
 Resources:
   ResourcesPrefixParameter:
     Type: AWS::SSM::Parameter
@@ -522,4 +567,103 @@ Resources:
       Description: The schedule expression for the EventBridge rule
       Tags:
         Name: !Sub "${ResourcesPrefix}-scheduleexpression-parameter"
+        Stack: ssm-parameters.yaml
+
+  FrontendTaskCpuParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendTaskCpu"
+      Type: String
+      Value: !Ref FrontendTaskCpu
+      Description: "The number of CPU units used by the frontend task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskcpu-frontend-parameter"
+        Stack: ssm-parameters.yaml
+
+  FrontendTaskMemoryParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendTaskMemory"
+      Type: String
+      Value: !Ref FrontendTaskMemory
+      Description: "The amount of memory (in MiB) used by the frontend task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskmemory-frontend-parameter"
+        Stack: ssm-parameters.yaml
+
+  BackendTaskCpuParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendTaskCpu"
+      Type: String
+      Value: !Ref BackendTaskCpu
+      Description: "The number of CPU units used by the backend task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskcpu-backend-parameter"
+        Stack: ssm-parameters.yaml
+
+  BackendTaskMemoryParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendTaskMemory"
+      Type: String
+      Value: !Ref BackendTaskMemory
+      Description: "The amount of memory (in MiB) used by the backend task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskmemory-backend-parameter"
+        Stack: ssm-parameters.yaml
+
+  HealthCheckTaskCpuParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/HealthCheckTaskCpu"
+      Type: String
+      Value: !Ref HealthCheckTaskCpu
+      Description: "The number of CPU units used by the health check task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskcpu-healthcheck-parameter"
+        Stack: ssm-parameters.yaml
+
+  HealthCheckTaskMemoryParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/HealthCheckTaskMemory"
+      Type: String
+      Value: !Ref HealthCheckTaskMemory
+      Description: "The amount of memory (in MiB) used by the health check task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskmemory-healthcheck-parameter"
+        Stack: ssm-parameters.yaml
+
+  MLTaskCpuParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLTaskCpu"
+      Type: String
+      Value: !Ref MLTaskCpu
+      Description: "The number of CPU units used by the ML task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskcpu-ml-parameter"
+        Stack: ssm-parameters.yaml
+
+  MLTaskMemoryParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLTaskMemory"
+      Type: String
+      Value: !Ref MLTaskMemory
+      Description: "The amount of memory (in MiB) used by the ML task"
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-taskmemory-ml-parameter"
+        Stack: ssm-parameters.yaml
+
+  EmailEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/EmailEndpoint"
+      Type: String
+      Value: !Ref EmailEndpoint
+      Description: Email address for the SNS topic subscription
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-email-endpoint-parameter"
         Stack: ssm-parameters.yaml
