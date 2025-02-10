@@ -25,11 +25,11 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-    # Tags:
-    #     - Key: Name
-    #       Value: !Sub "${ResourcesPrefix}-sns"
-    #     - Key: Stack
-    #       Value: !Ref StackName
+      Tags:
+          - Key: Name
+            Value: !Sub "${ResourcesPrefix}-sns"
+          - Key: Stack
+            Value: !Ref StackName
 Outputs:
   BucketName:
     Description: "Name of the S3 bucket created"
