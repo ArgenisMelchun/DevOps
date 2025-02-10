@@ -208,6 +208,60 @@ Parameters:
     Description: Email address for the SNS topic subscription
 
 Resources:
+  SGStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        ResourcesPrefix: !Ref ResourcesPrefix
+  EndPointStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PrivateSubnets: !Ref PrivateSubnets
+        RouteTables: !Ref RouteTables
+        VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
+  RDSStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/database/rds.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        DBUsername: !Ref DBUsername
+        DBInstanceClass: !Ref DBInstanceClass
+        DBEngine: !Ref DBEngine
+        DatabaseSecurityGroup: !GetAtt SGStack.Outputs.DatabaseSecurityGroup
+        PrivateSubnets: !Ref PrivateSubnets
+        DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
+        DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
+        DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
+  ALBStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PublicSubnets: !Ref PublicSubnets
+        ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
+  ECSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+  RoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        SecretArn: !GetAtt RDSStack.Outputs.SecretArn
   SNSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -215,171 +269,110 @@ Resources:
       Parameters:
         EmailEndpoint: !Ref EmailEndpoint
         ResourcesPrefix: !Ref ResourcesPrefix
-  # SGStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # SGStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # EndPointStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PrivateSubnets: !Ref PrivateSubnets
-  #       RouteTables: !Ref RouteTables
-  #       VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # RDSStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/database/rds.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       DBUsername: !Ref DBUsername
-  #       DBInstanceClass: !Ref DBInstanceClass
-  #       DBEngine: !Ref DBEngine
-  #       DatabaseSecurityGroup: !GetAtt SGStack.Outputs.DatabaseSecurityGroup
-  #       PrivateSubnets: !Ref PrivateSubnets
-  #       DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
-  #       DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
-  #       DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
-  # ALBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PublicSubnets: !Ref PublicSubnets
-  #       ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # ECSStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # RoleStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       SecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  # CloudWatchLogGroupStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
-  # FrontendStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/frontend-main.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ALB: !GetAtt ALBStack.Outputs.ALB
-  #       Subnets: !Ref PublicSubnets
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       TargetGroupName: !Ref FrontendTargetGroupName
-  #       ContainerPort: !Ref FrontendContainerPort
-  #       TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
-  #       ContainerName: !Ref FrontendContainerName
-  #       ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-  #       ECRImageRepository: !Ref FrontendImageRepository
-  #       TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-  #       ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
-  #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-  #       SecurityGroup: !GetAtt SGStack.Outputs.FrontendSecurityGroup
-  #       BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
-  #       ServiceName: !Ref ServiceName
-  #       DesiredCount: !Ref DesiredCount
-  #       TaskCpu: !Ref FrontendTaskCpu
-  #       TaskMemory: !Ref FrontendTaskMemory
-  # BackendStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/backend/backend-main.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ALB: !GetAtt ALBStack.Outputs.ALB
-  #       Subnets: !Ref PrivateSubnets
-  #       SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
-  #       ECRImageRepository: !Ref BackendImageRepository
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       TargetGroupName: !Ref BackendTargetGroupName
-  #       ContainerPort: !Ref BackendContainerPort
-  #       TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-  #       ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-  #       TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
-  #       ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
-  #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-  #       BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
-  #       ServiceName: !Ref BackendServiceName
-  #       DesiredCount: !Ref DesiredCount
-  #       ContainerName: !Ref BackendContainerName
-  #       RDSInstanceEndpoint: !GetAtt RDSStack.Outputs.RDSInstanceEndpoint
-  #       RDSInstancePort: !GetAtt RDSStack.Outputs.RDSInstancePort
-  #       DBName: !GetAtt RDSStack.Outputs.DBName
-  #       DBSecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  #       TaskCpu: !Ref BackendTaskCpu
-  #       TaskMemory: !Ref BackendTaskMemory
-  # MLStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/ml/ml-main.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ALB: !GetAtt ALBStack.Outputs.ALB
-  #       Subnets: !Ref PrivateSubnets
-  #       SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
-  #       ECRImageRepository: !Ref MLImageRepository
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-  #       ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-  #       TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
-  #       RDSInstanceEndpoint: !GetAtt RDSStack.Outputs.RDSInstanceEndpoint
-  #       RDSInstancePort: !GetAtt RDSStack.Outputs.RDSInstancePort
-  #       DBName: !GetAtt RDSStack.Outputs.DBName
-  #       DBSecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  #       ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
-  #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-  #       BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
-  #       DesiredCount: !Ref DesiredCount
-  #       TargetGroupName: !Ref MLTargetGroupName
-  #       ContainerPort: !Ref MLContainerPort
-  #       ServiceName: !Ref MLServiceName
-  #       ContainerName: !Ref MLContainerName
-  #       TaskCpu: !Ref MLTaskCpu
-  #       TaskMemory: !Ref MLTaskMemory
-  # HealthCheckStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/healthcheck/eventbridge.yaml"
-  #     Parameters:
-  #       Subnets: !Ref PrivateSubnets
-  #       SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
-  #       ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-  #       TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-  #       EventBridgeRoleArn: !GetAtt RoleStack.Outputs.EventBridgeRoleArn
-  #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-  #       ScheduleExpression: !Ref ScheduleExpression
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       HealthCheckImageRepository: !Ref HealthCheckImageRepository
-  #       TaskCpu: !Ref HealthCheckTaskCpu
-  #       TaskMemory: !Ref HealthCheckTaskMemory
+  CloudWatchLogGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
+  FrontendStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/frontend-main.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        ALB: !GetAtt ALBStack.Outputs.ALB
+        Subnets: !Ref PublicSubnets
+        ResourcesPrefix: !Ref ResourcesPrefix
+        TargetGroupName: !Ref FrontendTargetGroupName
+        ContainerPort: !Ref FrontendContainerPort
+        TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
+        ContainerName: !Ref FrontendContainerName
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        ECRImageRepository: !Ref FrontendImageRepository
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        SecurityGroup: !GetAtt SGStack.Outputs.FrontendSecurityGroup
+        BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
+        ServiceName: !Ref ServiceName
+        DesiredCount: !Ref DesiredCount
+        TaskCpu: !Ref FrontendTaskCpu
+        TaskMemory: !Ref FrontendTaskMemory
+  BackendStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/backend/backend-main.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        ALB: !GetAtt ALBStack.Outputs.ALB
+        Subnets: !Ref PrivateSubnets
+        SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
+        ECRImageRepository: !Ref BackendImageRepository
+        ResourcesPrefix: !Ref ResourcesPrefix
+        TargetGroupName: !Ref BackendTargetGroupName
+        ContainerPort: !Ref BackendContainerPort
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
+        ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
+        ServiceName: !Ref BackendServiceName
+        DesiredCount: !Ref DesiredCount
+        ContainerName: !Ref BackendContainerName
+        RDSInstanceEndpoint: !GetAtt RDSStack.Outputs.RDSInstanceEndpoint
+        RDSInstancePort: !GetAtt RDSStack.Outputs.RDSInstancePort
+        DBName: !GetAtt RDSStack.Outputs.DBName
+        DBSecretArn: !GetAtt RDSStack.Outputs.SecretArn
+        TaskCpu: !Ref BackendTaskCpu
+        TaskMemory: !Ref BackendTaskMemory
+  MLStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/ml/ml-main.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        ALB: !GetAtt ALBStack.Outputs.ALB
+        Subnets: !Ref PrivateSubnets
+        SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
+        ECRImageRepository: !Ref MLImageRepository
+        ResourcesPrefix: !Ref ResourcesPrefix
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
+        RDSInstanceEndpoint: !GetAtt RDSStack.Outputs.RDSInstanceEndpoint
+        RDSInstancePort: !GetAtt RDSStack.Outputs.RDSInstancePort
+        DBName: !GetAtt RDSStack.Outputs.DBName
+        DBSecretArn: !GetAtt RDSStack.Outputs.SecretArn
+        ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
+        DesiredCount: !Ref DesiredCount
+        TargetGroupName: !Ref MLTargetGroupName
+        ContainerPort: !Ref MLContainerPort
+        ServiceName: !Ref MLServiceName
+        ContainerName: !Ref MLContainerName
+        TaskCpu: !Ref MLTaskCpu
+        TaskMemory: !Ref MLTaskMemory
+  HealthCheckStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/healthcheck/eventbridge.yaml"
+      Parameters:
+        Subnets: !Ref PrivateSubnets
+        SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        EventBridgeRoleArn: !GetAtt RoleStack.Outputs.EventBridgeRoleArn
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        ScheduleExpression: !Ref ScheduleExpression
+        ResourcesPrefix: !Ref ResourcesPrefix
+        HealthCheckImageRepository: !Ref HealthCheckImageRepository
+        TaskCpu: !Ref HealthCheckTaskCpu
+        TaskMemory: !Ref HealthCheckTaskMemory

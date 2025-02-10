@@ -16,6 +16,7 @@ Resources:
   SNSTopic:
     Type: AWS::SNS::Topic
     Properties:
+      DisplayName: !Sub "${ResourcesPrefix}-sns"
       TopicName: !Sub "${ResourcesPrefix}-sns"
       Tags:
         - Key: Name
