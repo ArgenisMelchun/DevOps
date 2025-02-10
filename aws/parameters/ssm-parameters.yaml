@@ -221,6 +221,9 @@ Parameters:
     Default: 512
     Description: "The amount of memory (in MiB) used by the ML task"
 
+  EmailEndpoint:
+    Type: String
+    Description: Email address for the SNS topic subscription
 
 Resources:
   ResourcesPrefixParameter:
@@ -651,4 +654,15 @@ Resources:
       Description: "The amount of memory (in MiB) used by the ML task"
       Tags:
         Name: !Sub "${ResourcesPrefix}-taskmemory-ml-parameter"
+        Stack: ssm-parameters.yaml
+
+  EmailEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/EmailEndpoint"
+      Type: String
+      Value: !Ref EmailEndpoint
+      Description: Email address for the SNS topic subscription
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-email-endpoint-parameter"
         Stack: ssm-parameters.yaml
