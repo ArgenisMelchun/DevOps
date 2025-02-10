@@ -5,21 +5,26 @@ Parameters:
   VPCId:
     Default: "vpc-12345678"
     Type: String
+    Description: "VPC ID where the resources will be created"
 
   Subnets:
-    Default: subnet-037029409ebf2e40a,subnet-02d3b1f7781083329,subnet-04b8975560e504362,subnet-0bc409e74d3daace3,subnet-0f84440d859dff00a,subnet-0c2415ce936583b0f"
+    Default: "subnet-037029409ebf2e40a,subnet-02d3b1f7781083329,subnet-04b8975560e504362,subnet-0bc409e74d3daace3,subnet-0f84440d859dff00a,subnet-0c2415ce936583b0f"
     Type: String
+    Description: "Comma-separated list of subnet IDs for the NLB"
 
-  ALBSecurityGroup:
-    Default: "	sg-07a85aa8d8a283e31 "
+  ALBArn:
     Type: String
+    Default: "arn:aws:elasticloadbalancing:us-east-1:302672446683:loadbalancer/app/vwm-alb/90ad9b35081cb8a8"
+    Description: "ARN of the existing Application Load Balancer"
 
   StackName:
     Type: String
-    Default: alb.yaml
+    Default: "alb.yaml"
+    Description: "Stack name for tagging purposes"
 
   ResourcesPrefix:
     Type: String
+    Description: "Prefix to be used for naming resources"
 
 Resources:
   NLB:
@@ -42,9 +47,9 @@ Resources:
       VpcId: !Ref VPCId
       Protocol: TCP
       Port: 80
-      TargetType: instance
-      Targets:
-        - Id: !Ref ALB
+      TargetType: alb
+      LoadBalancerArns:
+        - !Ref ALBArn  
       Tags:
         - Key: Name
           Value: !Sub "${ResourcesPrefix}-alb-tg"
@@ -65,7 +70,7 @@ Outputs:
   NLB:
     Description: Logical ID of the NLB resource
     Value: !Ref NLB
-  
+
   NLBDNSName:
     Description: DNS Name of the NLB resource
     Value: !GetAtt NLB.DNSName
