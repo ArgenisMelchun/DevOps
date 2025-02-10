@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create an SNS topic with an email subscription and future IAM role restriction
+
+Parameters:
+  EmailEndpoint:
+    Type: String
+    Description: Email address for the SNS topic subscription
+
+  StackName:
+    Type: String
+    Description: Stack name, used for tagging
+
+  ResourcesPrefix:
+    Type: String
+    Description: Prefix for resources
+
+  ServiceName:
+    Type: String
+    Description: Service name
+
+Resources:
+  SNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${ResourcesPrefix}-${ServiceName}-sns"
+      Tags:
+        - Key: Name
+          Value: !Sub "${ResourcesPrefix}-${ServiceName}-tg"
+        - Key: Stack
+          Value: !Ref StackName
+
+  SNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: email
+      Endpoint: !Ref EmailEndpoint
+      TopicArn: !Ref SNSTopic
+
+  SNSPublishPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref SNSTopic
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: '*'  
+            Action:
+              - 'sns:Publish'
+            Resource: !Ref SNSTopic
+
+Outputs:
+  SNSTopicArn:
+    Description: ARN of the created SNS topic
+    Value: !Ref SNSTopic
+
+# 🔥 TODO: In the future, replace "AWS: '*'" with a specific IAM role ARN in the SNS policy 
+# to restrict who can publish messages to the topic.
