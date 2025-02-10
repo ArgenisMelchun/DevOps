@@ -223,6 +223,7 @@ Parameters:
 
   EmailEndpoint:
     Type: String
+    Default: ""
     Description: Email address for the SNS topic subscription
 
 Resources:
