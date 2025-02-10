@@ -208,7 +208,7 @@ Parameters:
     Description: Email address for the SNS topic subscription
 
   BucketName:
-    Type: String
+    Type: AWS::SSM::Parameter::Value<String>
     Default: /vwm-infrastructure/BucketName
     Description: "Name of the S3 bucket to be created"
 
