@@ -37,6 +37,10 @@ Outputs:
   ALB:
     Description: Logical ID of the ALB resource
     Value: !Ref ALB
+
+  ALBArn:
+    Description: ARN del Application Load Balancer
+    Value: !GetAtt ALB.LoadBalancerArn
   
   ALBDNSName:
     Description: DNS Name of the ALB resource
