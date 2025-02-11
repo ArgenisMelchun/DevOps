@@ -74,3 +74,7 @@ Outputs:
   NLBDNSName:
     Description: DNS Name of the NLB resource
     Value: !GetAtt NLB.DNSName
+
+
+#Note:
+# 1. The targets has to be registered manually to the target group due to the limitation of the CloudFormation

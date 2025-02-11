@@ -237,3 +237,4 @@ Outputs:
 #    ❌ The database should never be publicly accessible from `0.0.0.0/0`.
 # 2. Restrict `Ingress` traffic to specific ports and secure IP ranges.
 #    Use CIDR blocks with limited scope instead of `0.0.0.0/0` when possible.
+# 3. See how to enforce security from NLB to ALB
