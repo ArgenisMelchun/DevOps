@@ -274,7 +274,7 @@ Resources:
       TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
       Parameters:
         VPCId: !Ref VPCId
-        Subnets: !Ref PrivateSubnets
+        Subnets: !Ref PublicSubnets
         ALBArn: !GetAtt ALBStack.Outputs.ALBArn
         ResourcesPrefix: !Ref ResourcesPrefix
   ECSStack:
