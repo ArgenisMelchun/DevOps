@@ -14,9 +14,9 @@ Parameters:
   BucketVersioningConfiguration:
     Type: String
 
-  ResourceTags:
+  ProjectName:
     Type: String
-    Default: Test
+    Default: WVM-Advanced-Logistics-Analytics  
 
 Resources:
   S3Bucket:
@@ -46,6 +46,8 @@ Resources:
             Value: !Sub "${ResourcesPrefix}-s3"
           - Key: Stack
             Value: !Ref StackName
+          - Key: Project
+            Value: !Ref ProjectName
   
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -56,14 +58,14 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: "arn:aws:iam::${AWS::AccountId}:role/*"
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
             Action: "s3:*"
             Resource:
               - !Sub "arn:aws:s3:::${BucketName}"
               - !Sub "arn:aws:s3:::${BucketName}/*"
             Condition:
               StringEquals:
-                aws:PrincipalTag/Environment: !Ref ResourceTags
+                aws:PrincipalTag/Project: !Ref ProjectName
 
 Outputs:
   BucketName:
@@ -73,7 +75,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-BucketName"
 
 # 🔥 TODO: 
-  # Add a bucket policy to restrict access to the bucket to a specific IAM role
+  # Add a bucket policy to restrict access to the bucket to a specific tag
 
 # Open Questions:
   # Object lock will be enabled?
