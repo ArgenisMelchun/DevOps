@@ -702,3 +702,5 @@ Resources:
         Stack: ssm-parameters.yaml
 
 
+#TODO
+#1.- Add allowed values for the parameters
