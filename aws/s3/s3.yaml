@@ -58,7 +58,7 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
+              AWS: "*"
             Action: "s3:*"
             Resource:
               - !Sub "arn:aws:s3:::${BucketName}"
@@ -74,7 +74,7 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-BucketName"
 
-# 🔥 TODO: 
+# TODO: 
   # Add a bucket policy to restrict access to the bucket to a specific tag
 
 # Open Questions:
