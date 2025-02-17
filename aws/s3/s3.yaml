@@ -14,20 +14,6 @@ Parameters:
   BucketVersioningConfiguration:
     Type: String
 
-  BcketuEnableObjectLock:
-    Type: String
-    Default: "false"
-    AllowedValues:
-      - "true"
-      - "false"
-    Description: "Set to true to enable Object Lock. Once enabled, it cannot be disabled."
-
-Conditions:
-  UseObjectLock: 
-    Fn::Equals: 
-      - !Ref EnableObjectLock
-      - "true"
-
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -44,11 +30,6 @@ Resources:
               SSEAlgorithm: AES256
       VersioningConfiguration:
         Status: !Ref BucketVersioningConfiguration
-      ObjectLockConfiguration: 
-        !If 
-          - UseObjectLock
-          - ObjectLockEnabled: Enabled
-          - !Ref "AWS::NoValue"
       Tags:
           - Key: Name
             Value: !Sub "${ResourcesPrefix}-s3"
@@ -64,4 +45,4 @@ Outputs:
 # 🔥 TODO: 
 # Add a bucket policy to restrict access to the bucket to a specific IAM role
 # Add object lock?
-# Add lifecycle policy
+# Add lifecycle policy?
