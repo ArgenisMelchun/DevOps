@@ -231,7 +231,11 @@ Parameters:
 
   BucketVersioningCongiguration:
     Type: String
-    Default: Enabled
+    Default: Suspended
+    Description: "Validate if the versinoing is enabled or not"
+    AllowedValues:
+    - Enabled
+    - Suspended
 
 Resources:
   ResourcesPrefixParameter:
