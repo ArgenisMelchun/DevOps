@@ -21,6 +21,10 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
+
 Resources:
   ECRDKREndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -38,6 +42,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-ecr-dkr-vpce"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   ECRAPIEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -55,6 +61,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-ecr-api-vpce"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   SecretsManagerEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -72,6 +80,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-secretsmanager-vpce"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   CloudWatchLogsEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -89,6 +99,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-cloudwatch-logs-vpce"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   S3GatewayEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -109,6 +121,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-s3-gateway-vpce"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
 # ✅ ToDos (Best Practices)
 # 1. Improve S3 enpoint policy

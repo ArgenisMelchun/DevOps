@@ -9,6 +9,10 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics
+
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
@@ -28,6 +32,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-ecs-cluster"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 Outputs:
   ECSCluster:
     Description: ECS cluster

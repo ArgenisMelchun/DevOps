@@ -32,6 +32,10 @@ Parameters:
   TaskMemory:
     Type: String
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
+
 Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -63,6 +67,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-task"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
 Outputs:
   TaskDefinitionArn:

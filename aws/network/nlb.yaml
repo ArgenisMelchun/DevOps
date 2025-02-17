@@ -26,6 +26,10 @@ Parameters:
     Type: String
     Description: "Prefix to be used for naming resources"
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
+
 Resources:
   NLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -39,6 +43,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-nlb"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -55,6 +61,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-alb-tg"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   NLBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener

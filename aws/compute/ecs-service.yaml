@@ -50,6 +50,10 @@ Parameters:
     MinValue: 0
     MaxValue: 600
     Description: Grace period in seconds before health checks determine an ECS task is unhealthy.
+  
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
 
 Resources:
   TargetGroup:
@@ -71,6 +75,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-${ServiceName}-tg"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   ALBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -107,6 +113,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-${ServiceName}-service"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
 # ✅ ToDos (Best Practices)
 # 1. Define an `AutoScalingPolicy` to handle demand spikes and reduce costs.

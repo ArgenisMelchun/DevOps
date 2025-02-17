@@ -46,6 +46,10 @@ Parameters:
     Type: String
     Description: Time window for RDS maintenance (UTC time)
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
+
 Resources:
   RDSSecret:
     Type: AWS::SecretsManager::Secret
@@ -73,6 +77,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-rds-subnet-group"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   RDSInstance:
     Type: AWS::RDS::DBInstance
@@ -103,6 +109,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-rds-instance"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
 Outputs:
   SecretArn:

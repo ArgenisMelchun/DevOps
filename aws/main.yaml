@@ -217,6 +217,11 @@ Parameters:
     Default: /vwm-infrastructure/BucketVersioningConfiguration
     Description: "Validate if the versinoing is enabled or not"
 
+  ProjectNameParameter:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/ProjectName
+    Description: "Name of the project this will be added in tags"
+
 Resources:
   SNSStack:
     Type: AWS::CloudFormation::Stack
@@ -225,6 +230,7 @@ Resources:
       Parameters:
         EmailEndpoint: !Ref EmailEndpoint
         ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectNameParameter
   S3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -233,6 +239,7 @@ Resources:
         BucketName: !Ref BucketName
         ResourcesPrefix: !Ref ResourcesPrefix
         BucketVersioningConfiguration: !Ref BucketVersioningConfiguration
+        ProjectName: !Ref ProjectNameParameter
   # SGStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:

@@ -12,6 +12,10 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
+
 Resources:
   SNSTopic:
     Type: AWS::SNS::Topic
@@ -23,6 +27,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-sns"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
   SNSSubscription:
     Type: AWS::SNS::Subscription

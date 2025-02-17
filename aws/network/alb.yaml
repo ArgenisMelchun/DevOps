@@ -18,6 +18,10 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics  
+
 Resources:
   ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
@@ -32,6 +36,8 @@ Resources:
           Value: !Sub "${ResourcesPrefix}-alb"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Project
+          Value: !Ref ProjectName
 
 Outputs:
   ALB:
