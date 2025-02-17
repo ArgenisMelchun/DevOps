@@ -19,6 +19,13 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref BucketName
+      LifecycleConfiguration:
+        Rules:
+          - Id: MoveToIntelligentTiering
+            Status: Enabled
+            Transitions:
+              - StorageClass: INTELLIGENT_TIERING
+                TransitionInDays: 30
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         IgnorePublicAcls: true
@@ -44,5 +51,6 @@ Outputs:
 
 # 🔥 TODO: 
 # Add a bucket policy to restrict access to the bucket to a specific IAM role
-# Add object lock?
-# Add lifecycle policy?
+
+# Open Questions:
+  # Add object lock?
