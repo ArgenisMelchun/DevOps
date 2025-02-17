@@ -14,6 +14,10 @@ Parameters:
   BucketVersioningConfiguration:
     Type: String
 
+  ResourceTags:
+    Type: String
+    Default: Test
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -42,6 +46,25 @@ Resources:
             Value: !Sub "${ResourcesPrefix}-s3"
           - Key: Stack
             Value: !Ref StackName
+  
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: "arn:aws:iam::${AWS::AccountId}:role/*"
+            Action: "s3:*"
+            Resource:
+              - !Sub "arn:aws:s3:::${BucketName}"
+              - !Sub "arn:aws:s3:::${BucketName}/*"
+            Condition:
+              StringEquals:
+                aws:PrincipalTag/Environment: !Ref Environment
+
 Outputs:
   BucketName:
     Description: "Name of the S3 bucket created"
@@ -50,7 +73,7 @@ Outputs:
       Name: !Sub "${AWS::StackName}-BucketName"
 
 # 🔥 TODO: 
-# Add a bucket policy to restrict access to the bucket to a specific IAM role
+  # Add a bucket policy to restrict access to the bucket to a specific IAM role
 
 # Open Questions:
   # Add object lock?
