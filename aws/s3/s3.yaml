@@ -63,7 +63,7 @@ Resources:
               - !Sub "arn:aws:s3:::${BucketName}/*"
             Condition:
               StringEquals:
-                aws:PrincipalTag/Environment: !Ref Environment
+                aws:PrincipalTag/Environment: !Ref ResourceTags
 
 Outputs:
   BucketName:
@@ -76,4 +76,4 @@ Outputs:
   # Add a bucket policy to restrict access to the bucket to a specific IAM role
 
 # Open Questions:
-  # Add object lock?
+  # Object lock will be enabled?
