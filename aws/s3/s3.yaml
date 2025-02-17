@@ -23,7 +23,10 @@ Parameters:
     Description: "Set to true to enable Object Lock. Once enabled, it cannot be disabled."
 
 Conditions:
-  UseObjectLock: !Equals [!Ref EnableObjectLock, "true"]
+  UseObjectLock: 
+    Fn::Equals: 
+      - !Ref EnableObjectLock
+      - "true"
 
 Resources:
   S3Bucket:
