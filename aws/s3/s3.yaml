@@ -57,8 +57,7 @@ Resources:
         Version: "2012-10-17"
         Statement:
           - Effect: Allow
-            Principal:
-              AWS: "*"
+            Principal: "*"
             Action: "s3:*"
             Resource:
               - !Sub "arn:aws:s3:::${BucketName}"
