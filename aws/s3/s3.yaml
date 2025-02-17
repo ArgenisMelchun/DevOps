@@ -50,21 +50,22 @@ Resources:
             Value: !Ref ProjectName
   
   S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal: "*"
-            Action: "s3:*"
-            Resource:
-              - !Sub "arn:aws:s3:::${BucketName}"
-              - !Sub "arn:aws:s3:::${BucketName}/*"
-            Condition:
-              StringEquals:
-                aws:PrincipalTag/Project: !Ref ProjectName
+  Type: AWS::S3::BucketPolicy
+  Properties:
+    Bucket: !Ref S3Bucket
+    PolicyDocument:
+      Version: "2012-10-17"
+      Statement:
+        - Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/*"
+          Action: "s3:*"
+          Resource:
+            - !Sub "arn:aws:s3:::${BucketName}"
+            - !Sub "arn:aws:s3:::${BucketName}/*"
+          Condition:
+            StringEquals:
+              aws:PrincipalTag/Project: !Ref ProjectName
 
 Outputs:
   BucketName:
