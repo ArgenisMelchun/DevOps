@@ -13,7 +13,7 @@ Parameters:
 
   BucketVersioningCongiguration:
     Type: String
-    Default: Suspended
+    Default: Enabled
 
 
 Resources:
