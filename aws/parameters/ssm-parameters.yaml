@@ -229,7 +229,7 @@ Parameters:
     Type: String
     Description: "Name of the S3 bucket to be created"
 
-  BucketVersioningCongiguration:
+  BucketVersioningConfiguration:
     Type: String
     Default: Suspended
     Description: "Validate if the versinoing is enabled or not"
