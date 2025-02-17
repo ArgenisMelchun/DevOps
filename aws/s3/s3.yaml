@@ -11,7 +11,7 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
-  BucketVersioningCongiguration:
+  BucketVersioningConfiguration:
     Type: String
 
 Resources:
@@ -29,7 +29,7 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       VersioningConfiguration:
-        Status: !Ref BucketVersioningCongiguration
+        Status: !Ref BucketVersioningConfiguration
       Tags:
           - Key: Name
             Value: !Sub "${ResourcesPrefix}-s3"
