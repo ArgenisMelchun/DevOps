@@ -11,6 +11,11 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
+  BucketVersioningCongiguration:
+    Type: String
+    Default: Suspended
+
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
@@ -25,6 +30,8 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: !Ref BucketVersioningCongiguration
       Tags:
           - Key: Name
             Value: !Sub "${ResourcesPrefix}-s3"
