@@ -13,8 +13,6 @@ Parameters:
 
   BucketVersioningCongiguration:
     Type: String
-    Default: Enabled
-
 
 Resources:
   S3Bucket:
@@ -46,6 +44,5 @@ Outputs:
 
 # 🔥 TODO: 
 # Add a bucket policy to restrict access to the bucket to a specific IAM role
-# Add versioning
 # Add object lock
 # Add lifecycle policy

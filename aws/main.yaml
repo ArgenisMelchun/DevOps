@@ -211,6 +211,11 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /vwm-infrastructure/BucketName
     Description: "Name of the S3 bucket to be created"
+  
+  BucketVersioningCongiguration:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/BucketVersioningCongiguration
+    Description: "Validate if the versinoing is enabled or not"
 
 Resources:
   SNSStack:
@@ -227,6 +232,7 @@ Resources:
       Parameters:
         BucketName: !Ref BucketName
         ResourcesPrefix: !Ref ResourcesPrefix
+        BucketVersioningCongiguration: !Ref BucketVersioningCongiguration
   # SGStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
