@@ -229,6 +229,10 @@ Parameters:
     Type: String
     Description: "Name of the S3 bucket to be created"
 
+  BucketVersioningCongiguration:
+    Type: String
+    Default: Enabled
+
 Resources:
   ResourcesPrefixParameter:
     Type: AWS::SSM::Parameter
@@ -681,4 +685,16 @@ Resources:
       Tags:
         Name: !Sub "${ResourcesPrefix}-bucketname-parameter"
         Stack: ssm-parameters.yaml
+
+  BucketVersioningConfigurationParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-infrastructure/BucketVersioningConfiguration"
+      Type: String
+      Value: !Ref BucketVersioningConfiguration
+      Description: Controls whether bucket versioning is enabled or suspended
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-bucket-versioning-parameter"
+        Stack: ssm-parameters.yaml
+
 
