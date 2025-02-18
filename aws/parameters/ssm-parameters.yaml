@@ -34,7 +34,7 @@ Parameters:
     Type: String
     Default: https://stack-vwm-advanced-logistics-analytics-infrastructure
     Description: The base URL for the S3 bucket where the CloudFormation templates are stored
-    AllowedPattern: ^https://[a-zA-Z0-9.-_/]+$
+    AllowedPattern: ^https://[a-zA-Z0-9._/-]+/?$
 
   # Networking
   VPCId:
