@@ -4,27 +4,27 @@ Description: Root stack
 Parameters:
   BaseTemplateURLParameter:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BaseTemplateS3URL
+    Default: /vwm-dev-infrastructure/BaseTemplateS3URL
     Description: The base URL for the S3 bucket where the CloudFormation templates are stored
 
   VPCId:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/VPCId
+    Default: /vwm-dev-infrastructure/VPCId
     Description: The ID of the existing VPC
 
   ResourcesPrefix:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/ResourcesPrefix
+    Default: /vwm-dev-infrastructure/ResourcesPrefix
     Description: Prefix used for naming AWS resources and tagging
 
   DBUsername:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/DBUsername
+    Default: /vwm-dev-infrastructure/DBUsername
     Description: The username for the database instance
 
   DBInstanceClass:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/DBInstanceClass
+    Default: /vwm-dev-infrastructure/DBInstanceClass
     Description: The instance class for the database
 
   DBEngine:
@@ -34,202 +34,202 @@ Parameters:
   
   DBBackupRetentionPeriod:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/DBBackupRetentionPeriod
+    Default: /vwm-dev-infrastructure/DBBackupRetentionPeriod
     Description: Number of days to retain automatic backups
 
   DBPreferredBackupWindow:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/DBPreferredBackupWindow
+    Default: /vwm-dev-infrastructure/DBPreferredBackupWindow
     Description: Time window for automated backups (UTC time)
 
   DBPreferredMaintenanceWindow:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/DBPreferredMaintenanceWindow
+    Default: /vwm-dev-infrastructure/DBPreferredMaintenanceWindow
     Description: Time window for RDS maintenance (UTC time)
 
   PrivateSubnets:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/PrivateSubnets
+    Default: /vwm-dev-infrastructure/PrivateSubnets
     Description: List of private subnet IDs, separated by commas
 
   RouteTables:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/RouteTables
+    Default: /vwm-dev-infrastructure/RouteTables
     Description: List of route table IDs, separated by commas
 
   PublicSubnets:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/PublicSubnets
+    Default: /vwm-dev-infrastructure/PublicSubnets
     Description: List of public subnet IDs, separated by commas
 
   CWLogGroupRetentionInDays:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/CWLogGroupRetentionInDays
+    Default: /vwm-dev-infrastructure/CWLogGroupRetentionInDays
     Description: Number of days to retain logs in the CloudWatch LogGroup
 
   FrontendTargetGroupName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendTargetGroupName
+    Default: /vwm-dev-infrastructure/FrontendTargetGroupName
     Description: The name of the Target Group for the frontend service
 
   FrontendContainerPort:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendContainerPort
+    Default: /vwm-dev-infrastructure/FrontendContainerPort
     Description: The port on which the frontend container listens
 
   TargetGroupHealthCheckPath:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/TargetGroupHealthCheckPath
+    Default: /vwm-dev-infrastructure/TargetGroupHealthCheckPath
     Description: The health check path for the frontend Target Group
   
   FrontendContainerName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendContainerName
+    Default: /vwm-dev-infrastructure/FrontendContainerName
     Description: The name of the frontend container in ECS
 
   FrontendImageRepository:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendImageRepository
+    Default: /vwm-dev-infrastructure/FrontendImageRepository
     Description: ECR image repository for the frontend
 
   FrontendServiceName:  
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendServiceName
+    Default: /vwm-dev-infrastructure/FrontendServiceName
     Description: Name of the ECS service (e.g., frontend, backend)
 
   DesiredCount:  
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/DesiredCount
+    Default: /vwm-dev-infrastructure/DesiredCount
     Description: Number of ECS tasks to run
 
   BackendTargetGroupName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendTargetGroupName
+    Default: /vwm-dev-infrastructure/BackendTargetGroupName
     Description: The name of the Target Group for the backend service
 
   BackendContainerPort:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendContainerPort
+    Default: /vwm-dev-infrastructure/BackendContainerPort
     Description: The port on which the backend container listens
 
   BackendContainerName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendContainerName
+    Default: /vwm-dev-infrastructure/BackendContainerName
     Description: The name of the backend container in ECS
 
   BackendImageRepository:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendImageRepository
+    Default: /vwm-dev-infrastructure/BackendImageRepository
     Description: ECR image repository for the backend
 
   MLImageRepository:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLImageRepository
+    Default: /vwm-dev-infrastructure/MLImageRepository
     Description: ECR image repository for the ML model
 
   HealthCheckImageRepository:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/HealthCheckImageRepository
+    Default: /vwm-dev-infrastructure/HealthCheckImageRepository
     Description: ECR image repository for the health check
 
   BackendServiceName:  
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendServiceName
+    Default: /vwm-dev-infrastructure/BackendServiceName
     Description: Name of the ECS service (e.g., frontend, backend)
 
   MLTargetGroupName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLTargetGroupName
+    Default: /vwm-dev-infrastructure/MLTargetGroupName
     Description: The name of the Target Group for the ML service
   
   MLContainerPort:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLContainerPort
+    Default: /vwm-dev-infrastructure/MLContainerPort
     Description: The port on which the ML container listens
 
   MLServiceName:  
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLServiceName
+    Default: /vwm-dev-infrastructure/MLServiceName
     Description: Name of the ECS service (e.g., frontend, backend)
 
   MLContainerName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLContainerName
+    Default: /vwm-dev-infrastructure/MLContainerName
     Description: The name of the ML container in ECS
 
   ScheduleExpression:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/ScheduleExpression
+    Default: /vwm-dev-infrastructure/ScheduleExpression
     Description: The schedule expression for the EventBridge rule
 
   FrontendTaskCpu:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendTaskCpu
+    Default: /vwm-dev-infrastructure/FrontendTaskCpu
     Description: "The number of CPU units used by the frontend task"
 
   FrontendTaskMemory:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/FrontendTaskMemory
+    Default: /vwm-dev-infrastructure/FrontendTaskMemory
     Description: "The amount of memory (in MiB) used by the frontend task"
 
   BackendTaskCpu:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendTaskCpu
+    Default: /vwm-dev-infrastructure/BackendTaskCpu
     Description: "The number of CPU units used by the backend task"
 
   BackendTaskMemory:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BackendTaskMemory
+    Default: /vwm-dev-infrastructure/BackendTaskMemory
     Description: "The amount of memory (in MiB) used by the backend task"
 
   HealthCheckTaskCpu:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/HealthCheckTaskCpu
+    Default: /vwm-dev-infrastructure/HealthCheckTaskCpu
     Description: "The number of CPU units used by the health check task"
 
   HealthCheckTaskMemory:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/HealthCheckTaskMemory
+    Default: /vwm-dev-infrastructure/HealthCheckTaskMemory
     Description: "The amount of memory (in MiB) used by the health check task"
 
   MLTaskCpu:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLTaskCpu
+    Default: /vwm-dev-infrastructure/MLTaskCpu
     Description: "The number of CPU units used by the ML task"
 
   MLTaskMemory:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/MLTaskMemory
+    Default: /vwm-dev-infrastructure/MLTaskMemory
     Description: "The amount of memory (in MiB) used by the ML task"
 
   EmailEndpoint:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/EmailEndpoint
+    Default: /vwm-dev-infrastructure/EmailEndpoint
     Description: Email address for the SNS topic subscription
 
   BucketName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BucketName
+    Default: /vwm-dev-infrastructure/BucketName
     Description: "Name of the S3 bucket to be created"
   
   BucketVersioningConfiguration:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/BucketVersioningConfiguration
+    Default: /vwm-dev-infrastructure/BucketVersioningConfiguration
     Description: "Validate if the versinoing is enabled or not"
 
   ProjectName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/ProjectName
+    Default: /vwm-dev-infrastructure/ProjectName
     Description: "Name of the project this will be added in tags"
 
   Environment:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/Environment
+    Default: /vwm-dev-infrastructure/Environment
     Description: Specify the deployment environment
     
   Team:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/Team
+    Default: /vwm-dev-infrastructure/Team
     Description: Specify the team responsible for the deployment
 
 Resources:
