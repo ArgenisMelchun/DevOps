@@ -256,6 +256,8 @@ Resources:
         ResourcesPrefix: !Ref ResourcesPrefix
         BucketVersioningConfiguration: !Ref BucketVersioningConfiguration
         ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   SNSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -264,6 +266,8 @@ Resources:
         EmailEndpoint: !Ref EmailEndpoint
         ResourcesPrefix: !Ref ResourcesPrefix
         ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   # EndPointStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
