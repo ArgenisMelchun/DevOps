@@ -37,21 +37,6 @@ Resources:
       Endpoint: !Ref EmailEndpoint
       TopicArn: !Ref SNSTopic
 
-  # SNSPublishPolicy:
-  #   Type: AWS::SNS::TopicPolicy
-  #   Properties:
-  #     Topics:
-  #       - !Ref SNSTopic
-  #     PolicyDocument:
-  #       Version: '2012-10-17'
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             AWS: '*'  
-  #           Action:
-  #             - 'sns:Publish'
-  #           Resource: !Ref SNSTopic
-
 Outputs:
   SNSTopicArn:
     Description: ARN of the created SNS topic

@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Parameters:
   BucketName:
     Type: String
-    Description: "Name of the S3 bucket to be created"
     
   StackName:
     Type: String
@@ -48,7 +47,7 @@ Resources:
             Value: !Ref StackName
           - Key: Project
             Value: !Ref ProjectName
-            
+
 Outputs:
   BucketName:
     Description: "Name of the S3 bucket created"
