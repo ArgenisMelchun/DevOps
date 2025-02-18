@@ -92,9 +92,9 @@ Parameters:
     Default: /vwm-infrastructure/FrontendImageRepository
     Description: ECR image repository for the frontend
 
-  ServiceName:  
+  FrontendServiceName:  
     Type: AWS::SSM::Parameter::Value<String>
-    Default: /vwm-infrastructure/ServiceName
+    Default: /vwm-infrastructure/FrontendServiceName
     Description: Name of the ECS service (e.g., frontend, backend)
 
   DesiredCount:  
@@ -217,20 +217,36 @@ Parameters:
     Default: /vwm-infrastructure/BucketVersioningConfiguration
     Description: "Validate if the versinoing is enabled or not"
 
-  ProjectNameParameter:
+  ProjectName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /vwm-infrastructure/ProjectName
     Description: "Name of the project this will be added in tags"
 
+  Environment:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/Environment
+    Description: Specify the deployment environment
+    
+  Team:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /vwm-infrastructure/Team
+    Description: Specify the team responsible for the deployment
+
 Resources:
-  SNSStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/sns/sns.yaml"
-      Parameters:
-        EmailEndpoint: !Ref EmailEndpoint
-        ResourcesPrefix: !Ref ResourcesPrefix
-        ProjectName: !Ref ProjectNameParameter
+# RoleStack:
+#   Type: AWS::CloudFormation::Stack
+#   Properties:
+#     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
+#     Parameters:
+#       ResourcesPrefix: !Ref ResourcesPrefix
+#       SecretArn: !GetAtt RDSStack.Outputs.SecretArn
+# SGStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
+  #     Parameters:
+  #       VPCId: !Ref VPCId
+  #       ResourcesPrefix: !Ref ResourcesPrefix
   S3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -239,14 +255,15 @@ Resources:
         BucketName: !Ref BucketName
         ResourcesPrefix: !Ref ResourcesPrefix
         BucketVersioningConfiguration: !Ref BucketVersioningConfiguration
-        ProjectName: !Ref ProjectNameParameter
-  # SGStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+  SNSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/sns/sns.yaml"
+      Parameters:
+        EmailEndpoint: !Ref EmailEndpoint
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
   # EndPointStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
@@ -272,6 +289,13 @@ Resources:
   #       DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
   #       DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
   #       DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
+  # CloudWatchLogGroupStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
+  #     Parameters:
+  #       ResourcesPrefix: !Ref ResourcesPrefix
+  #       CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
   # ALBStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
@@ -296,20 +320,6 @@ Resources:
   #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
   #     Parameters:
   #       ResourcesPrefix: !Ref ResourcesPrefix
-  # RoleStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       SecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  # CloudWatchLogGroupStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
   # FrontendStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
@@ -331,7 +341,7 @@ Resources:
   #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
   #       SecurityGroup: !GetAtt SGStack.Outputs.FrontendSecurityGroup
   #       BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
-  #       ServiceName: !Ref ServiceName
+  #       ServiceName: !Ref FrontendServiceName
   #       DesiredCount: !Ref DesiredCount
   #       TaskCpu: !Ref FrontendTaskCpu
   #       TaskMemory: !Ref FrontendTaskMemory

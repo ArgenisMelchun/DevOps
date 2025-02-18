@@ -15,19 +15,29 @@ Parameters:
   ProjectName:
     Type: String 
 
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
+
 Resources:
   SNSTopic:
     Type: AWS::SNS::Topic
     Properties:
-      DisplayName: !Sub "${ResourcesPrefix}-sns"
-      TopicName: !Sub "${ResourcesPrefix}-sns"
+      DisplayName: !Sub "${ResourcesPrefix}-${Environment}-sns"
+      TopicName: !Sub "${ResourcesPrefix}-${Environment}-sns"
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-sns"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-sns"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   SNSSubscription:
     Type: AWS::SNS::Subscription

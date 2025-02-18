@@ -16,11 +16,17 @@ Parameters:
   ProjectName:
     Type: String 
 
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
+
 Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref BucketName
+      BucketName: !Sub "${ResourcesPrefix}-${Environment}-${BucketName}"
       LifecycleConfiguration:
         Rules:
           - Id: MoveToIntelligentTiering
@@ -41,21 +47,17 @@ Resources:
         Status: !Ref BucketVersioningConfiguration
       Tags:
           - Key: Name
-            Value: !Sub "${ResourcesPrefix}-s3"
+            Value: !Sub "${ResourcesPrefix}-${Environment}-s3"
           - Key: Stack
             Value: !Ref StackName
           - Key: Project
             Value: !Ref ProjectName
-
-Outputs:
-  BucketName:
-    Description: "Name of the S3 bucket created"
-    Value: !Ref S3Bucket
-    Export:
-      Name: !Sub "${AWS::StackName}-BucketName"
-
-# TODO: 
-  # Add a bucket policy to restrict access to the bucket to a specific tag
+          - Key: Project
+            Value: !Ref ProjectName
+          - Key: Environment
+            Value: !Ref Environment
+          - Key: Team
+            Value: !Ref Team
 
 # Open Questions:
   # Object lock will be enabled?

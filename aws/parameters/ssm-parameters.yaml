@@ -2,32 +2,62 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: Stack to define SSM Parameters for VWM Infrastructure
 
 Parameters:
+  # General Configuration
   ResourcesPrefix:
     Type: String
     Default: vwm
     Description: Prefix used for naming AWS resources and tagging
+    AllowedPattern: ^[a-zA-Z0-9-]+$
+
+  ProjectName:
+    Type: String
+    Default: WVM-Advanced-Logistics-Analytics
+    Description: The name of the project this will be added in tags
+    AllowedPattern: ^[a-zA-Z0-9-]+$
+
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - stage
+      - prod
+    Description: Specify the deployment environment
+    
+  Team:
+    Type: String
+    Default: abat
+    Description: Specify the team responsible for the deployment
+    AllowedPattern: ^[a-zA-Z0-9-]+$
 
   BaseTemplateURL:
     Type: String
     Default: https://stack-vwm-advanced-logistics-analytics-infrastructure
     Description: The base URL for the S3 bucket where the CloudFormation templates are stored
+    AllowedPattern: ^https://[a-zA-Z0-9.-_/]+$
 
+  # Networking
   VPCId:
     Type: String
     Description: The ID of the existing VPC
+    AllowedPattern: ^vpc-[a-f0-9]+$
 
   PublicSubnets:
     Type: String
     Description: List of public subnet IDs, separated by commas
+    AllowedPattern: ^subnet-[a-f0-9]+(,subnet-[a-f0-9]+)*$
 
   PrivateSubnets:
     Type: String
     Description: List of private subnet IDs, separated by commas
+    AllowedPattern: ^subnet-[a-f0-9]+(,subnet-[a-f0-9]+)*$
 
   RouteTables:
     Type: String
     Description: List of route table IDs, separated by commas
+    AllowedPattern: ^rtb-[a-f0-9]+(,rtb-[a-f0-9]+)*$
 
+  # Database
   DBUsername:
     Type: String
     Default: postgres
@@ -59,12 +89,15 @@ Parameters:
     Type: String
     Default: 07:00-08:00
     Description: Time window for automated backups (UTC time)
+    AllowedPattern: ^([01]?[0-9]|2[0-3]):[0-5][0-9]-([01]?[0-9]|2[0-3]):[0-5][0-9]$
 
   DBPreferredMaintenanceWindow:
     Type: String
     Default: sun:08:00-sun:09:00
     Description: Time window for RDS maintenance (UTC time)
+    AllowedPattern: ^(mon|tue|wed|thu|fri|sat|sun):([01]?[0-9]|2[0-3]):[0-5][0-9]-(mon|tue|wed|thu|fri|sat|sun):([01]?[0-9]|2[0-3]):[0-5][0-9]$
 
+  # Load Balancer & Target Groups
   TargetGroupHealthCheckPath:
     Type: String
     Default: "/health"
@@ -78,26 +111,6 @@ Parameters:
     AllowedPattern: ^[a-zA-Z0-9-]+$
     ConstraintDescription: Must contain only letters, numbers, and hyphens (-)
 
-  FrontendContainerPort:
-    Type: Number
-    Default: 80
-    Description: The port on which the frontend container listens
-    MinValue: 1
-    MaxValue: 65535
-    ConstraintDescription: Must be a valid TCP/UDP port between 1 and 65535
-
-  FrontendContainerName:
-    Type: String
-    Default: FrontendContainer
-    Description: The name of the frontend container in ECS
-    AllowedPattern: ^[a-zA-Z0-9_-]+$
-    ConstraintDescription: Must contain only letters, numbers, underscores (_), and hyphens (-)
-
-  FrontendImageRepository:
-    Type: String
-    Default: vwm-advanced-logistics-analytics-infrastructure-frontend:latest
-    Description: ECR image repository for the frontend
-
   BackendTargetGroupName:
     Type: String
     Default: backend-tg
@@ -105,20 +118,78 @@ Parameters:
     AllowedPattern: ^[a-zA-Z0-9-]+$
     ConstraintDescription: Must contain only letters, numbers, and hyphens (-)
 
+  MLTargetGroupName:
+    Type: String
+    Default: ml-tg
+    Description: The name of the Target Group for the ML service
+    AllowedPattern: ^[a-zA-Z0-9-]+$
+    ConstraintDescription: Must contain only letters, numbers, and hyphens (-)
+
+  # ECS Services & Containers
+  FrontendServiceName:
+    Type: String
+    Default: frontend
+    Description: Name of the ECS service (e.g., frontend, backend)
+
+  BackendServiceName:
+    Type: String
+    Default: backend
+    Description: Name of the ECS backend service
+
+  MLServiceName:
+    Type: String
+    Default: ml
+    Description: Name of the ECS ML service
+
+  FrontendContainerPort:
+    Type: Number
+    Default: 80
+    MinValue: 1
+    MaxValue: 65535
+    Description: The port on which the frontend container listens
+    ConstraintDescription: Must be a valid TCP/UDP port between 1 and 65535
+
   BackendContainerPort:
     Type: Number
     Default: 5000
-    Description: The port on which the backend container listens
     MinValue: 1
     MaxValue: 65535
+    Description: The port on which the backend container listens
     ConstraintDescription: Must be a valid TCP/UDP port between 1 and 65535
+
+  MLContainerPort:
+    Type: Number
+    Default: 5001
+    MinValue: 1
+    MaxValue: 65535
+    Description: The port on which the ML container listens
+    ConstraintDescription: Must be a valid TCP/UDP port between 1 and 65535
+
+  FrontendContainerName:
+    Type: String
+    Default: FrontendContainer
+    Description: The name of the frontend container in ECS
+    AllowedPattern: ^[a-zA-Z0-9-]+$
+    ConstraintDescription: Must contain only letters, numbers, underscores (_), and hyphens (-)
 
   BackendContainerName:
     Type: String
-    Default: BackContainer
+    Default: BackendContainer
     Description: The name of the backend container in ECS
-    AllowedPattern: ^[a-zA-Z0-9_-]+$
+    AllowedPattern: ^[a-zA-Z0-9-]+$
     ConstraintDescription: Must contain only letters, numbers, underscores (_), and hyphens (-)
+
+  MLContainerName:
+    Type: String
+    Default: MLContainer
+    Description: The name of the ML container in ECS
+    AllowedPattern: ^[a-zA-Z0-9-]+$
+    ConstraintDescription: Must contain only letters, numbers, underscores (_), and hyphens (-)
+
+  FrontendImageRepository:
+    Type: String
+    Default: vwm-advanced-logistics-analytics-infrastructure-frontend:latest
+    Description: ECR image repository for the frontend
 
   BackendImageRepository:
     Type: String
@@ -135,634 +206,719 @@ Parameters:
     Default: vwm-advanced-logistics-analytics-infrastructure-health-check:latest
     Description: ECR image repository for the health check
 
-  CWLogGroupRetentionInDays:
-    Type: Number
-    Default: 30
-    Description: Number of days to retain logs in the CloudWatch LogGroup
-
-  ServiceName:  
-    Type: String
-    Default: frontend
-    Description: Name of the ECS service (e.g., frontend, backend)
-
-  DesiredCount:  
-    Type: Number
-    Default: 1
-    MinValue: 1
-    Description: Number of ECS tasks to run
-
-  BackendServiceName:
-    Type: String
-    Default: backend
-    Description: Name of the ECS service (e.g., frontend, backend)
-
-  MLTargetGroupName:
-    Type: String
-    Default: ml-tg
-    Description: The name of the Target Group for the ML service
-  
-  MLContainerPort:
-    Type: Number
-    Default: 5001
-    Description: The port on which the ML container listens
-
-  MLServiceName:  
-    Type: String
-    Default: ml
-    Description: Name of the ECS service (e.g., frontend, backend)
-
-  MLContainerName:
-    Type: String
-    Default: MLContainer
-    Description: The name of the ML container in ECS
-
-  ScheduleExpression:
-    Type: String
-    Default: "cron(0 0 1 */4 ? *)"
-    Description: The schedule expression for the EventBridge rule
-
   FrontendTaskCpu:
     Type: String
     Default: 256
     Description: "The number of CPU units used by the frontend task"
+    AllowedValues: [256, 512, 1024, 2048, 4096]
 
   FrontendTaskMemory:
     Type: String
     Default: 512
     Description: "The amount of memory (in MiB) used by the frontend task"
+    AllowedValues: [512, 1024, 2048, 4096, 8192, 16384]
 
   BackendTaskCpu:
     Type: String
     Default: 256
     Description: "The number of CPU units used by the backend task"
+    AllowedValues: [256, 512, 1024, 2048, 4096]
 
   BackendTaskMemory:
     Type: String
     Default: 512
     Description: "The amount of memory (in MiB) used by the backend task"
-
-  HealthCheckTaskCpu:
-    Type: String
-    Default: 256
-    Description: "The number of CPU units used by the health check task"
-
-  HealthCheckTaskMemory:
-    Type: String
-    Default: 512
-    Description: "The amount of memory (in MiB) used by the health check task"
+    AllowedValues: [512, 1024, 2048, 4096, 8192, 16384]
 
   MLTaskCpu:
     Type: String
     Default: 256
     Description: "The number of CPU units used by the ML task"
+    AllowedValues: [256, 512, 1024, 2048, 4096]
 
   MLTaskMemory:
     Type: String
     Default: 512
     Description: "The amount of memory (in MiB) used by the ML task"
+    AllowedValues: [512, 1024, 2048, 4096, 8192, 16384]
 
-  EmailEndpoint:
+  HealthCheckTaskCpu:
     Type: String
-    Description: Email address for the SNS topic subscription
+    Default: 256
+    Description: "The number of CPU units used by the health check task"
+    AllowedValues: [256, 512, 1024, 2048, 4096]
 
+  HealthCheckTaskMemory:
+    Type: String
+    Default: 512
+    Description: "The amount of memory (in MiB) used by the health check task"
+    AllowedValues: [512, 1024, 2048, 4096, 8192, 16384]
+
+  DesiredCount:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    Description: Number of ECS tasks to run
+
+  ScheduleExpression:
+    Type: String
+    Default: "cron(0 0 1 */4 ? *)"
+    Description: The schedule expression for the EventBridge rule
+    ConstraintDescription: "Must be a valid cron expression."
+
+  # Bucket
   BucketName:
     Type: String
+    Default: advanced-logistics-analytics-files
     Description: "Name of the S3 bucket to be created"
+    AllowedPattern: ^[a-z0-9.-]{3,63}$
 
   BucketVersioningConfiguration:
     Type: String
     Default: Suspended
-    Description: "Validate if the versinoing is enabled or not"
+    Description: "Validate if the versioning is enabled or not"
     AllowedValues:
-    - Enabled
-    - Suspended
-  
-  ProjectName:
+      - Enabled
+      - Suspended
+
+  # SNS
+  EmailEndpoint:
     Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
-    Description: The name of the project this will be added in tags
+    Description: Email address for the SNS topic subscription
+    AllowedPattern: "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+
+  # CloudWatch Logs
+  CWLogGroupRetentionInDays:
+    Type: Number
+    Default: 30
+    Description: Number of days to retain logs in the CloudWatch LogGroup
 
 Resources:
   ResourcesPrefixParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/ResourcesPrefix"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/ResourcesPrefix"
       Type: String
       Value: !Ref ResourcesPrefix
       Description: The Resouces Prefix
       Tags:
-        Name: !Sub "${ResourcesPrefix}-prefix-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-prefix-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BaseTemplateURLParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BaseTemplateS3URL" 
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BaseTemplateS3URL" 
       Type: String
       Value: !Ref BaseTemplateURL
       Description: The base URL for the S3 bucket where the CloudFormation templates are stored
       Tags:
-        Name: !Sub "${ResourcesPrefix}-basetemplates3url-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-basetemplates3url-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
-
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   VPCIdParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/VPCId"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/VPCId"
       Type: String
       Value: !Ref VPCId
       Description: The ID of the existing VPC
       Tags:
-        Name: !Sub "${ResourcesPrefix}-vpcid-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-vpcid-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   PublicSubnetsParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/PublicSubnets"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/PublicSubnets"
       Type: String
       Value: !Ref PublicSubnets
       Description: List of public subnet IDs, separated by commas
       Tags:
-        Name: !Sub "${ResourcesPrefix}-publicsubnets-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-publicsubnets-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   PrivateSubnetsParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/PrivateSubnets"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/PrivateSubnets"
       Type: String
       Value: !Ref PrivateSubnets
       Description: List of private subnet IDs, separated by commas
       Tags:
-        Name: !Sub "${ResourcesPrefix}-privatesubnets-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-privatesubnets-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   RouteTablesParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/RouteTables"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/RouteTables"
       Type: String
       Value: !Ref RouteTables
       Description: List of route table IDs, separated by commas
       Tags:
-        Name: !Sub "${ResourcesPrefix}-routetables-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-routetables-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   DBUsernameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/DBUsername"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBUsername"
       Type: String
       Value: !Ref DBUsername
       Description: The username for the database instance
       Tags:
-        Name: !Sub "${ResourcesPrefix}-dbusername-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-dbusername-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   DBInstanceClassParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/DBInstanceClass"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBInstanceClass"
       Type: String
       Value: !Ref DBInstanceClass
       Description: The instance class for the database
       Tags:
-        Name: !Sub "${ResourcesPrefix}-dbinstanceclass-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-dbinstanceclass-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   FrontendImageRepositoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendImageRepository"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendImageRepository"
       Type: String
       Value: !Ref FrontendImageRepository
       Description: ECR image repository for the frontend
       Tags:
-        Name: !Sub "${ResourcesPrefix}-frontendimagerepo-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-frontendimagerepo-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendImageRepositoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendImageRepository"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendImageRepository"
       Type: String
       Value: !Ref BackendImageRepository
       Description: ECR image repository for the backend
       Tags:
-        Name: !Sub "${ResourcesPrefix}-backendimagerepo-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-backendimagerepo-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLImageRepositoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLImageRepository"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLImageRepository"
       Type: String
       Value: !Ref MLImageRepository
       Description: ECR image repository for the ML model
       Tags:
-        Name: !Sub "${ResourcesPrefix}-mlimagerepo-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-mlimagerepo-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   HealthCheckImageRepositoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/HealthCheckImageRepository"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/HealthCheckImageRepository"
       Type: String
       Value: !Ref HealthCheckImageRepository
       Description: ECR image repository for the health check
       Tags:
-        Name: !Sub "${ResourcesPrefix}-healthcheckimagerepo-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-healthcheckimagerepo-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   DBBackupRetentionPeriodParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/DBBackupRetentionPeriod"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBBackupRetentionPeriod"
       Type: String
       Value: !Ref DBBackupRetentionPeriod
       Description: "Number of days to retain automatic backups"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-dbbackupretentionperiod-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-dbbackupretentionperiod-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   DBPreferredBackupWindowParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/DBPreferredBackupWindow"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBPreferredBackupWindow"
       Type: String
       Value: !Ref DBPreferredBackupWindow
       Description: "Time window for automated backups (UTC time)"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-dbpreferredbackupwindow-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-dbpreferredbackupwindow-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   DBPreferredMaintenanceWindowParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/DBPreferredMaintenanceWindow"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBPreferredMaintenanceWindow"
       Type: String
       Value: !Ref DBPreferredMaintenanceWindow
       Description: "Time window for RDS maintenance (UTC time)"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-dbpreferredmaintenancewindow-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-dbpreferredmaintenancewindow-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   CWLogGroupRetentionInDaysParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/CWLogGroupRetentionInDays"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/CWLogGroupRetentionInDays"
       Type: String
       Value: !Ref CWLogGroupRetentionInDays
       Description: Number of days to retain logs in the CloudWatch LogGroup
       Tags:
-        Name: !Sub "${ResourcesPrefix}-cwloggroupretention-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-cwloggroupretention-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   FrontendTargetGroupNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendTargetGroupName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendTargetGroupName"
       Type: String
       Value: !Ref FrontendTargetGroupName
       Description: The name of the Target Group for the frontend service
       Tags:
-        Name: !Sub "${ResourcesPrefix}-frontendtargetgroupname-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-frontendtargetgroupname-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   FrontendContainerPortParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendContainerPort"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendContainerPort"
       Type: String
       Value: !Ref FrontendContainerPort
       Description: The port on which the frontend container listens
       Tags:
-        Name: !Sub "${ResourcesPrefix}-frontendcontainerport-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-frontendcontainerport-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   TargetGroupHealthCheckPathParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/TargetGroupHealthCheckPath"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/TargetGroupHealthCheckPath"
       Type: String
       Value: !Ref TargetGroupHealthCheckPath
       Description: The health check path for the frontend Target Group
       Tags:
-        Name: !Sub "${ResourcesPrefix}-targetgrouphealthcheckpath-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-targetgrouphealthcheckpath-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   FrontendContainerNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendContainerName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendContainerName"
       Type: String
       Value: !Ref FrontendContainerName
       Description: The name of the frontend container in ECS
       Tags:
-        Name: !Sub "${ResourcesPrefix}-frontendcontainername-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-frontendcontainername-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   ServiceNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/ServiceName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendServiceName"
       Type: String
-      Value: !Ref ServiceName
+      Value: !Ref FrontendServiceName
       Description: Name of the ECS service (e.g., frontend, backend)
       Tags:
-        Name: !Sub "${ResourcesPrefix}-servicename-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-servicename-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   DesiredCountParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/DesiredCount"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DesiredCount"
       Type: String
       Value: !Ref DesiredCount
       Description: Number of ECS tasks to run
       Tags:
-        Name: !Sub "${ResourcesPrefix}-desiredcount-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-desiredcount-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendTargetGroupNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendTargetGroupName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendTargetGroupName"
       Type: String
       Value: !Ref BackendTargetGroupName
       Description: The name of the Target Group for the backend service
       Tags:
-        Name: !Sub "${ResourcesPrefix}-backendtargetgroupname-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-backendtargetgroupname-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendContainerPortParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendContainerPort"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendContainerPort"
       Type: String
       Value: !Ref BackendContainerPort
       Description: The port on which the backend container listens
       Tags:
-        Name: !Sub "${ResourcesPrefix}-backendcontainerport-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-backendcontainerport-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendContainerNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendContainerName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendContainerName"
       Type: String
       Value: !Ref BackendContainerName
       Description: The name of the backend container in ECS
       Tags:
-        Name: !Sub "${ResourcesPrefix}-backendcontainername-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-backendcontainername-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendServiceNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendServiceName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendServiceName"
       Type: String
       Value: !Ref BackendServiceName
       Description: Name of the ECS service (e.g., frontend, backend)
       Tags:
-        Name: !Sub "${ResourcesPrefix}-backendservicename-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-backendservicename-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLTargetGroupNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLTargetGroupName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLTargetGroupName"
       Type: String
       Value: !Ref MLTargetGroupName
       Description: The name of the Target Group for the ML service
       Tags:
-        Name: !Sub "${ResourcesPrefix}-mltargetgroupname-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-mltargetgroupname-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLContainerPortParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLContainerPort"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLContainerPort"
       Type: String
       Value: !Ref MLContainerPort
       Description: The port on which the ML container listens
       Tags:
-        Name: !Sub "${ResourcesPrefix}-mlcontainerport-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-mlcontainerport-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
-
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLServiceNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLServiceName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLServiceName"
       Type: String
       Value: !Ref MLServiceName
       Description: Name of the ECS service for ML
       Tags:
-        Name: !Sub "${ResourcesPrefix}-mlservicename-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-mlservicename-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
-
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLContainerNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLContainerName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLContainerName"
       Type: String
       Value: !Ref MLContainerName
       Description: The name of the ML container in ECS
       Tags:
-        Name: !Sub "${ResourcesPrefix}-mlcontainername-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-mlcontainername-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
-
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   ScheduleExpressionParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/ScheduleExpression"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/ScheduleExpression"
       Type: String
       Value: !Ref ScheduleExpression
       Description: The schedule expression for the EventBridge rule
       Tags:
-        Name: !Sub "${ResourcesPrefix}-scheduleexpression-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-scheduleexpression-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
-
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   FrontendTaskCpuParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendTaskCpu"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendTaskCpu"
       Type: String
       Value: !Ref FrontendTaskCpu
       Description: "The number of CPU units used by the frontend task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskcpu-frontend-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskcpu-frontend-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   FrontendTaskMemoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/FrontendTaskMemory"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/FrontendTaskMemory"
       Type: String
       Value: !Ref FrontendTaskMemory
       Description: "The amount of memory (in MiB) used by the frontend task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskmemory-frontend-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskmemory-frontend-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendTaskCpuParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendTaskCpu"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendTaskCpu"
       Type: String
       Value: !Ref BackendTaskCpu
       Description: "The number of CPU units used by the backend task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskcpu-backend-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskcpu-backend-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BackendTaskMemoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BackendTaskMemory"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BackendTaskMemory"
       Type: String
       Value: !Ref BackendTaskMemory
       Description: "The amount of memory (in MiB) used by the backend task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskmemory-backend-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskmemory-backend-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   HealthCheckTaskCpuParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/HealthCheckTaskCpu"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/HealthCheckTaskCpu"
       Type: String
       Value: !Ref HealthCheckTaskCpu
       Description: "The number of CPU units used by the health check task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskcpu-healthcheck-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskcpu-healthcheck-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   HealthCheckTaskMemoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/HealthCheckTaskMemory"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/HealthCheckTaskMemory"
       Type: String
       Value: !Ref HealthCheckTaskMemory
       Description: "The amount of memory (in MiB) used by the health check task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskmemory-healthcheck-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskmemory-healthcheck-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLTaskCpuParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLTaskCpu"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLTaskCpu"
       Type: String
       Value: !Ref MLTaskCpu
       Description: "The number of CPU units used by the ML task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskcpu-ml-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskcpu-ml-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   MLTaskMemoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/MLTaskMemory"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/MLTaskMemory"
       Type: String
       Value: !Ref MLTaskMemory
       Description: "The amount of memory (in MiB) used by the ML task"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-taskmemory-ml-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-taskmemory-ml-parameter"
         Stack: ssm-parameters.yaml
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   EmailEndpointParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/EmailEndpoint"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/EmailEndpoint"
       Type: String
       Value: !Ref EmailEndpoint
       Description: Email address for the SNS topic subscription
       Tags:
-        Name: !Sub "${ResourcesPrefix}-email-endpoint-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-email-endpoint-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BucketNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BucketName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BucketName"
       Type: String
       Value: !Ref BucketName
       Description: "Name of the S3 bucket to be created"
       Tags:
-        Name: !Sub "${ResourcesPrefix}-bucketname-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-bucketname-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   BucketVersioningConfigurationParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/BucketVersioningConfiguration"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/BucketVersioningConfiguration"
       Type: String
       Value: !Ref BucketVersioningConfiguration
       Description: Controls whether bucket versioning is enabled or suspended
       Tags:
-        Name: !Sub "${ResourcesPrefix}-bucket-versioning-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-bucket-versioning-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
   ProjectNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "/${ResourcesPrefix}-infrastructure/ProjectName"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/ProjectName"
       Type: String
       Value: !Ref ProjectName
       Description: The name of the project
       Tags:
-        Name: !Sub "${ResourcesPrefix}-projectname-parameter"
+        Name: !Sub "${ResourcesPrefix}-${Environment}-projectname-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
+  EnvironmentParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/Environment"
+      Type: String
+      Value: !Ref Environment
+      Description: The deployment environment
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-${Environment}-environment-parameter"
+        Stack: ssm-parameters.yaml
+        Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
 
-#TODO
-#1.- Add allowed values for the parameters
+  TeamParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/Team"
+      Type: String
+      Value: !Ref Team
+      Description: The team responsible for the deployment
+      Tags:
+        Name: !Sub "${ResourcesPrefix}-${Environment}-team-parameter"
+        Stack: ssm-parameters.yaml
+        Project: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
