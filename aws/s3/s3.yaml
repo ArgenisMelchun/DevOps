@@ -14,8 +14,7 @@ Parameters:
     Type: String
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
 
 Resources:
   S3Bucket:

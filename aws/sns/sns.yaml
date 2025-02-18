@@ -13,8 +13,7 @@ Parameters:
     Type: String
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
 
 Resources:
   SNSTopic:
@@ -41,6 +40,3 @@ Outputs:
   SNSTopicArn:
     Description: ARN of the created SNS topic
     Value: !Ref SNSTopic
-
-# 🔥 TODO: In the future, replace "AWS: '*'" with a specific IAM role ARN in the SNS policy 
-# to restrict who can publish messages to the topic.
