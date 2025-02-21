@@ -234,12 +234,15 @@ Parameters:
 
 Resources:
   SGStack:
-      Type: AWS::CloudFormation::Stack
-      Properties:
-        TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
-        Parameters:
-          VPCId: !Ref VPCId
-          ResourcesPrefix: !Ref ResourcesPrefix
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   S3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
