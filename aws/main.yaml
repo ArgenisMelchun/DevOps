@@ -442,20 +442,23 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  # HealthCheckStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/healthcheck/eventbridge.yaml"
-  #     Parameters:
-  #       Subnets: !Ref PrivateSubnets
-  #       SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
-  #       ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-  #       TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-  #       EventBridgeRoleArn: !GetAtt RoleStack.Outputs.EventBridgeRoleArn
-  #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-  #       ScheduleExpression: !Ref ScheduleExpression
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       HealthCheckImageRepository: !Ref HealthCheckImageRepository
-  #       TaskCpu: !Ref HealthCheckTaskCpu
-  #       TaskMemory: !Ref HealthCheckTaskMemory
+  HealthCheckStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/healthcheck/eventbridge.yaml"
+      Parameters:
+        Subnets: !Ref PrivateSubnets
+        SecurityGroup: !GetAtt SGStack.Outputs.BackendSecurityGroup
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        EventBridgeRoleArn: !GetAtt RoleStack.Outputs.EventBridgeRoleArn
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        ScheduleExpression: !Ref ScheduleExpression
+        ResourcesPrefix: !Ref ResourcesPrefix
+        HealthCheckImageRepository: !Ref HealthCheckImageRepository
+        TaskCpu: !Ref HealthCheckTaskCpu
+        TaskMemory: !Ref HealthCheckTaskMemory
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team

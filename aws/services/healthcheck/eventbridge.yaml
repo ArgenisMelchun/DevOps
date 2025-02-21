@@ -38,14 +38,19 @@ Parameters:
     Type: String
   
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Sub "${ResourcesPrefix}-task"
+      Family: !Sub "${ResourcesPrefix}-${Environment}-task"
       Cpu: !Ref TaskCpu
       Memory: !Ref TaskMemory
       NetworkMode: awsvpc
@@ -65,16 +70,21 @@ Resources:
               awslogs-stream-prefix: "ecs"
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-task"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-task"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team 
+        
 
   EventRule:
     Type: AWS::Events::Rule
     Properties:
-      Name: !Sub "${ResourcesPrefix}-healthcheck-event-rule" 
+      Name: !Sub "${ResourcesPrefix}-${Environment}-healthcheck-event-rule" 
       ScheduleExpression: !Ref ScheduleExpression
       State: ENABLED
       Targets:
