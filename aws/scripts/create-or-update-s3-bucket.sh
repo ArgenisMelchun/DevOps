@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Is not up do date.
+
 # Script to deploy or update an AWS CloudFormation stack for creating an S3 bucket.
 # This script prompts the user for the stack name and bucket name, then creates or updates the stack.
 # The deployment includes server-side encryption and public access restrictions.
