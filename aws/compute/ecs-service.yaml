@@ -116,6 +116,6 @@ Resources:
         - Key: Project
           Value: !Ref ProjectName
 
-# ✅ ToDos (Best Practices)
+# ToDos (Best Practices)
 # 1. Define an `AutoScalingPolicy` to handle demand spikes and reduce costs.
 # 2. Consider enabling `stickiness` in `TargetGroup` if session persistence is required.

@@ -95,6 +95,7 @@ Resources:
 
   RDSInstance:
     Type: AWS::RDS::DBInstance
+    DeletionPolicy: Snapshot
     Properties:
       DBInstanceIdentifier: !Sub "${ResourcesPrefix}-${Environment}-rds-instance"
       DBName: !Sub "${ResourcesPrefix}${Environment}database"
@@ -108,8 +109,7 @@ Resources:
         - !Ref DatabaseSecurityGroup
       PubliclyAccessible: yes  # Change to false in production
       StorageEncrypted: true
-      DeletionProtection: false  # Change to true in production
-      #DeletionPolicy: Delete  # Change to Retain in production
+      DeletionProtection: true
       MultiAZ: false  # Change to true in production
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: false
@@ -150,10 +150,7 @@ Outputs:
     Description: The username for the RDS database
     Value: !Ref DBUsername
   
-# ✅ ToDos (Best Practices)
+# ToDos (Best Practices)
 # 1. Enable `MultiAZ` for high availability if this is a production database.
-# 2. Use `DeletionPolicy: Retain` to prevent accidental database deletion in case of a stack deletion.
-# 3. Set `PubliclyAccessible: false` to avoid exposing the RDS instance.
-# 4. Enable `DeletionProtection: true`  to prevent accidental deletions.
-# 5. Add SecretsManager policy
-# 6. See documentation and verify how stack changes can affect the database
+# 2. Set `PubliclyAccessible: false` to avoid exposing the RDS instance.
+# 3. See documentation and verify how stack changes can affect the database

@@ -91,4 +91,6 @@ Outputs:
 
 #Note:
 # 1. The targets has to be registered manually to the target group due to the limitation of the CloudFormation
+
+# ToDos
 # 2. There is a listerner with port 80 if we configure tls we have to add 443 instead of 80
