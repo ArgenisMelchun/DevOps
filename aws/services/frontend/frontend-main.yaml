@@ -63,6 +63,15 @@ Parameters:
   TaskMemory:
     Type: String
 
+  ProjectName:
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
+
 Resources:
   FrontendTaskDefinitionStack:
     Type: AWS::CloudFormation::Stack
@@ -79,6 +88,9 @@ Resources:
         CloudWatchLogGroupName: !Ref CloudWatchLogGroupName
         TaskCpu: !Ref TaskCpu
         TaskMemory: !Ref TaskMemory
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   FrontendServiceStack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -98,3 +110,6 @@ Resources:
         ECSCluster: !Ref ECSCluster
         TaskDefinitionArn: !GetAtt FrontendTaskDefinitionStack.Outputs.TaskDefinitionArn
         DesiredCount: !Ref DesiredCount
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
