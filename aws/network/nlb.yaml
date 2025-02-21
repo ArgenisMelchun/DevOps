@@ -3,53 +3,54 @@ Description: Stack to create Network Load Balancer in front of Application Load 
 
 Parameters:
   VPCId:
-    Default: "vpc-12345678"
     Type: String
-    Description: "VPC ID where the resources will be created"
 
   Subnets:
-    Default: "subnet-037029409ebf2e40a,subnet-02d3b1f7781083329,subnet-04b8975560e504362,subnet-0bc409e74d3daace3,subnet-0f84440d859dff00a,subnet-0c2415ce936583b0f"
     Type: String
-    Description: "Comma-separated list of subnet IDs for the NLB"
 
   ALBArn:
     Type: String
-    Default: "arn:aws:elasticloadbalancing:us-east-1:302672446683:loadbalancer/app/vwm-alb/90ad9b35081cb8a8"
-    Description: "ARN of the existing Application Load Balancer"
 
   StackName:
     Type: String
     Default: "alb.yaml"
-    Description: "Stack name for tagging purposes"
 
   ResourcesPrefix:
     Type: String
-    Description: "Prefix to be used for naming resources"
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   NLB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub "${ResourcesPrefix}-nlb"
+      Name: !Sub "${ResourcesPrefix}-${Environment}-nlb"
       Scheme: internet-facing
       Subnets: !Split [",", !Ref Subnets]
       Type: network
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-nlb"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-nlb"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub "${ResourcesPrefix}-alb-tg"
+      Name: !Sub "${ResourcesPrefix}-${Environment}-alb-tg"
       VpcId: !Ref VPCId
       Protocol: TCP
       Port: 80
@@ -58,11 +59,15 @@ Resources:
         - !Ref ALBArn  
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-alb-tg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-tg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   NLBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
@@ -73,6 +78,10 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref ALBTargetGroup
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
 Outputs:
   NLB:
@@ -86,3 +95,4 @@ Outputs:
 
 #Note:
 # 1. The targets has to be registered manually to the target group due to the limitation of the CloudFormation
+# 2. There is a listerner with port 80 if we configure tls we have to add 443 instead of 80

@@ -308,15 +308,18 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  # NLBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       Subnets: !Ref PublicSubnets
-  #       ALBArn: !GetAtt ALBStack.Outputs.ALBArn
-  #       ResourcesPrefix: !Ref ResourcesPrefix
+  NLBStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        Subnets: !Ref PublicSubnets
+        ALBArn: !GetAtt ALBStack.Outputs.ALBArn
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   # RDSStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
@@ -344,8 +347,6 @@ Resources:
   #      Environment: !Ref Environment
   #      Team: !Ref Team
   #      SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
-
-
   # FrontendStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
