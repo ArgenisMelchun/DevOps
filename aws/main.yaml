@@ -338,18 +338,18 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  #RoleStack:
-  #  Type: AWS::CloudFormation::Stack
-  #  Properties:
-  #    TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
-  #    Parameters:
-  #      ResourcesPrefix: !Ref ResourcesPrefix
-  #      SecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  #      S3BucketName: !GetAtt S3Stack.Outputs.S3BucketName
-  #      ProjectName: !Ref ProjectName
-  #      Environment: !Ref Environment
-  #      Team: !Ref Team
-  #      SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
+  RoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        SecretArn: !GetAtt RDSStack.Outputs.SecretArn
+        S3BucketName: !GetAtt S3Stack.Outputs.S3BucketName
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+        SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
   # FrontendStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
