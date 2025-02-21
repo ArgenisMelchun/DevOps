@@ -19,21 +19,26 @@ Parameters:
     Type: String
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   ALB:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub "${ResourcesPrefix}-alb"
+      Name: !Sub "${ResourcesPrefix}-${Environment}-alb"
       Scheme: internet-facing
       Subnets: !Split [",", !Ref PublicSubnets]
       SecurityGroups:
         - !Ref ALBSecurityGroup
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-alb"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-alb"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project

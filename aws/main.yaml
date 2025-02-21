@@ -296,15 +296,18 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  # ALBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PublicSubnets: !Ref PublicSubnets
-  #       ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
+  ALBStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PublicSubnets: !Ref PublicSubnets
+        ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   # NLBStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
