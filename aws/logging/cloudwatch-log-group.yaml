@@ -1,7 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: Stack to create CloudWatch LogGroup
 
-
 Parameters:
   ResourcesPrefix:
     Type: String
@@ -15,8 +14,13 @@ Parameters:
     Description: Number of days to retain logs in the CloudWatch LogGroup
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String  
 
 Resources:
   CloudWatchLogGroup:
@@ -31,6 +35,10 @@ Resources:
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
 Outputs:
   CloudWatchLogGroupName:

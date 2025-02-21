@@ -264,6 +264,16 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
+  CloudWatchLogGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   # RDSStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
@@ -301,14 +311,6 @@ Resources:
   #       RouteTables: !Ref RouteTables
   #       VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
   #       ResourcesPrefix: !Ref ResourcesPrefix
-
-  # CloudWatchLogGroupStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
   # ALBStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
