@@ -113,7 +113,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - ecs:RunTask
-                Resource: "*"  # TODO TaskDefinitionArn of healthcheck task
+                Resource: "*"
               - Effect: Allow
                 Action:
                   - iam:PassRole

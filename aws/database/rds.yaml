@@ -47,14 +47,19 @@ Parameters:
     Description: Time window for RDS maintenance (UTC time)
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   RDSSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: !Sub "/${ResourcesPrefix}/rds-master-password"
+      Name: !Sub "/${ResourcesPrefix}-${Environment}/rds-master-password"
       Description: "Master password for RDS instance"
       GenerateSecretString:
         SecretStringTemplate: !Sub '{"username": "${DBUsername}"}'
@@ -63,9 +68,13 @@ Resources:
         ExcludeCharacters: '"@/\'
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-rds-secret"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-rds-secret"
         - Key: Stack
           Value: !Ref StackName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   RDSSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
@@ -74,17 +83,21 @@ Resources:
       SubnetIds: !Split [",", !Ref PrivateSubnets]
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-rds-subnet-group"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-rds-subnet-group"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   RDSInstance:
     Type: AWS::RDS::DBInstance
     Properties:
-      DBInstanceIdentifier: !Sub "${ResourcesPrefix}-rds-instance"
-      DBName: !Sub "${ResourcesPrefix}database"
+      DBInstanceIdentifier: !Sub "${ResourcesPrefix}-${Environment}-rds-instance"
+      DBName: !Sub "${ResourcesPrefix}-${Environment}-database"
       MasterUsername: !Ref DBUsername
       MasterUserPassword: !Sub "{{resolve:secretsmanager:${RDSSecret}::password}}"
       Engine: !Ref DBEngine
@@ -106,11 +119,15 @@ Resources:
       CopyTagsToSnapshot: true
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-rds-instance"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-rds-instance"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
 Outputs:
   SecretArn:
@@ -127,7 +144,7 @@ Outputs:
 
   DBName:
     Description: The name of the RDS database
-    Value: !Sub "${ResourcesPrefix}database"
+    Value: !Sub "${ResourcesPrefix}-${Environment}-database"
 
   DBUsername:
     Description: The username for the RDS database

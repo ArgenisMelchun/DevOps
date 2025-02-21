@@ -13,7 +13,7 @@ Parameters:
 
   StackName:
     Type: String
-    Default: "alb.yaml"
+    Default: "nlb.yaml"
 
   ResourcesPrefix:
     Type: String
