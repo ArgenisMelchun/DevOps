@@ -22,8 +22,13 @@ Parameters:
     Type: String
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   ECRDKREndpoint:
@@ -39,11 +44,15 @@ Resources:
         - !Ref VPCEndpointsSecurityGroup
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-ecr-dkr-vpce"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-ecr-dkr-vpce"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   ECRAPIEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -58,11 +67,15 @@ Resources:
         - !Ref VPCEndpointsSecurityGroup
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-ecr-api-vpce"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-ecr-api-vpce"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   SecretsManagerEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -77,11 +90,15 @@ Resources:
         - !Ref VPCEndpointsSecurityGroup
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-secretsmanager-vpce"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-secretsmanager-vpce"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   CloudWatchLogsEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -96,11 +113,15 @@ Resources:
         - !Ref VPCEndpointsSecurityGroup 
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-cloudwatch-logs-vpce"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-cloudwatch-logs-vpce"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   S3GatewayEndpoint:
     Type: AWS::EC2::VPCEndpoint
@@ -118,11 +139,15 @@ Resources:
             Resource: "*"
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-s3-gateway-vpce"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-s3-gateway-vpce"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
 # ✅ ToDos (Best Practices)
 # 1. Improve S3 enpoint policy

@@ -283,6 +283,37 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
+  EndPointStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PrivateSubnets: !Ref PrivateSubnets
+        RouteTables: !Ref RouteTables
+        VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  # ALBStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
+  #     Parameters:
+  #       VPCId: !Ref VPCId
+  #       PublicSubnets: !Ref PublicSubnets
+  #       ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
+  #       ResourcesPrefix: !Ref ResourcesPrefix
+  # NLBStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
+  #     Parameters:
+  #       VPCId: !Ref VPCId
+  #       Subnets: !Ref PublicSubnets
+  #       ALBArn: !GetAtt ALBStack.Outputs.ALBArn
+  #       ResourcesPrefix: !Ref ResourcesPrefix
   # RDSStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
@@ -310,34 +341,7 @@ Resources:
   #      Environment: !Ref Environment
   #      Team: !Ref Team
   #      SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
-  # EndPointStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PrivateSubnets: !Ref PrivateSubnets
-  #       RouteTables: !Ref RouteTables
-  #       VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # ALBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PublicSubnets: !Ref PublicSubnets
-  #       ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  # NLBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       Subnets: !Ref PublicSubnets
-  #       ALBArn: !GetAtt ALBStack.Outputs.ALBArn
-  #       ResourcesPrefix: !Ref ResourcesPrefix
+
 
   # FrontendStack:
   #   Type: AWS::CloudFormation::Stack
