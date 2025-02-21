@@ -233,13 +233,13 @@ Parameters:
     Description: Specify the team responsible for the deployment
 
 Resources:
-# SGStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ResourcesPrefix: !Ref ResourcesPrefix
+  SGStack:
+      Type: AWS::CloudFormation::Stack
+      Properties:
+        TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/sg.yaml"
+        Parameters:
+          VPCId: !Ref VPCId
+          ResourcesPrefix: !Ref ResourcesPrefix
   S3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
@@ -261,23 +261,6 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-# RoleStack:
-#   Type: AWS::CloudFormation::Stack
-#   Properties:
-#     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
-#     Parameters:
-#       ResourcesPrefix: !Ref ResourcesPrefix
-#       SecretArn: !GetAtt RDSStack.Outputs.SecretArn  
-  # EndPointStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PrivateSubnets: !Ref PrivateSubnets
-  #       RouteTables: !Ref RouteTables
-  #       VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
   # RDSStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
@@ -293,6 +276,29 @@ Resources:
   #       DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
   #       DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
   #       DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
+  RoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        SecretArn: !GetAtt RDSStack.Outputs.SecretArn
+        S3BucketName: !GetAtt S3Stack.Outputs.S3BucketName
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+        SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
+  # EndPointStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
+  #     Parameters:
+  #       VPCId: !Ref VPCId
+  #       PrivateSubnets: !Ref PrivateSubnets
+  #       RouteTables: !Ref RouteTables
+  #       VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
+  #       ResourcesPrefix: !Ref ResourcesPrefix
+
   # CloudWatchLogGroupStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:

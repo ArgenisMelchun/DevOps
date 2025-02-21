@@ -52,8 +52,6 @@ Resources:
             Value: !Ref StackName
           - Key: Project
             Value: !Ref ProjectName
-          - Key: Project
-            Value: !Ref ProjectName
           - Key: Environment
             Value: !Ref Environment
           - Key: Team

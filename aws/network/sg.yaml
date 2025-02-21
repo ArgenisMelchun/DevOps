@@ -13,8 +13,13 @@ Parameters:
     Type: String
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   ALBSecurityGroup:
@@ -24,11 +29,15 @@ Resources:
       VpcId: !Ref VPCId
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-alb-sg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-sg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   FrontendSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -37,11 +46,15 @@ Resources:
       VpcId: !Ref VPCId
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-frontend-sg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-frontend-sg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   BackendSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -50,11 +63,15 @@ Resources:
       VpcId: !Ref VPCId
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-backend-sg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-backend-sg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -63,11 +80,15 @@ Resources:
       VpcId: !Ref VPCId
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-database-sg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-database-sg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
   VPCEndpointsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -76,11 +97,15 @@ Resources:
       VpcId: !Ref VPCId
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-vpce-sg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-vpce-sg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
 
   ALBIngress80:

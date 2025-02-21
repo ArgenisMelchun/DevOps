@@ -20,12 +20,18 @@ Parameters:
     
   Team:
     Type: String 
+  
+  S3BucketName:
+    Type: String
+
+  SNSTopicArn:
+    Type: String
 
 Resources:
   TaskExecutionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${ResourcesPrefix}-ecs-taskexecution-role"
+      RoleName: !Sub "${ResourcesPrefix}-${Environment}-ecs-taskexecution-role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -53,7 +59,7 @@ Resources:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/${ResourcesPrefix}-task:*"
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/${ResourcesPrefix}-${Environment}-task:*"
         - PolicyName: S3Access
           PolicyDocument:
             Version: "2012-10-17"
@@ -78,11 +84,9 @@ Resources:
                 Resource: !Ref SNSTopicArn
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-ecs-taskexecution-role"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-ecs-taskexecution-role"
         - Key: Stack
           Value: !Ref StackName
-        - Key: Project
-          Value: !Ref ProjectName
         - Key: Project
           Value: !Ref ProjectName
         - Key: Environment
@@ -93,7 +97,7 @@ Resources:
   EventBridgeRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub "${ResourcesPrefix}-eventbridge-role"
+      RoleName: !Sub "${ResourcesPrefix}-${Environment}-eventbridge-role"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -109,18 +113,16 @@ Resources:
               - Effect: Allow
                 Action:
                   - ecs:RunTask
-                Resource: "*" 
+                Resource: "*"  # TODO TaskDefinitionArn of healthcheck task
               - Effect: Allow
                 Action:
                   - iam:PassRole
                 Resource: !GetAtt TaskExecutionRole.Arn
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-eventbridge-role"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-eventbridge-role"
         - Key: Stack
           Value: !Ref StackName
-        - Key: Project
-          Value: !Ref ProjectName
         - Key: Project
           Value: !Ref ProjectName
         - Key: Environment
@@ -136,6 +138,3 @@ Outputs:
   EventBridgeRoleArn:
     Description: "ARN del Role utilizado por EventBridge para ejecutar ECS Task"
     Value: !GetAtt EventBridgeRole.Arn
-
-
-# TODO restrict the permissions of the roles
