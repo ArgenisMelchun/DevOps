@@ -308,36 +308,36 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  NLBStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
-      Parameters:
-        VPCId: !Ref VPCId
-        Subnets: !Ref PublicSubnets
-        ALBArn: !GetAtt ALBStack.Outputs.ALBArn
-        ResourcesPrefix: !Ref ResourcesPrefix
-        ProjectName: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
-  RDSStack:
-    Type: AWS::CloudFormation::Stack
-    DependsOn: EndPointStack
-    Properties:
-      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/database/rds.yaml"
-      Parameters:
-        ResourcesPrefix: !Ref ResourcesPrefix
-        DBUsername: !Ref DBUsername
-        DBInstanceClass: !Ref DBInstanceClass
-        DBEngine: !Ref DBEngine
-        DatabaseSecurityGroup: !GetAtt SGStack.Outputs.DatabaseSecurityGroup
-        PrivateSubnets: !Ref PrivateSubnets
-        DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
-        DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
-        DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
-        ProjectName: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
+  #NLBStack:
+  #  Type: AWS::CloudFormation::Stack
+  #  Properties:
+  #    TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
+  #    Parameters:
+  #      VPCId: !Ref VPCId
+  #      Subnets: !Ref PublicSubnets
+  #      ALBArn: !GetAtt ALBStack.Outputs.ALBArn
+  #      ResourcesPrefix: !Ref ResourcesPrefix
+  #      ProjectName: !Ref ProjectName
+  #      Environment: !Ref Environment
+  #      Team: !Ref Team
+  #RDSStack:
+  #  Type: AWS::CloudFormation::Stack
+  #  DependsOn: EndPointStack
+  #  Properties:
+  #    TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/database/rds.yaml"
+  #    Parameters:
+  #      ResourcesPrefix: !Ref ResourcesPrefix
+  #      DBUsername: !Ref DBUsername
+  #      DBInstanceClass: !Ref DBInstanceClass
+  #      DBEngine: !Ref DBEngine
+  #      DatabaseSecurityGroup: !GetAtt SGStack.Outputs.DatabaseSecurityGroup
+  #      PrivateSubnets: !Ref PrivateSubnets
+  #      DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
+  #      DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
+  #      DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
+  #      ProjectName: !Ref ProjectName
+  #      Environment: !Ref Environment
+  #      Team: !Ref Team
   #RoleStack:
   #  Type: AWS::CloudFormation::Stack
   #  Properties:
