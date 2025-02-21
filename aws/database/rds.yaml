@@ -110,7 +110,7 @@ Resources:
       PubliclyAccessible: yes  # Change to false in production
       StorageEncrypted: true
       DeletionProtection: true
-      MultiAZ: false  # Change to true in production
+      MultiAZ: false
       AllowMajorVersionUpgrade: false
       AutoMinorVersionUpgrade: false
       PreferredBackupWindow: !Ref DBPreferredBackupWindow
