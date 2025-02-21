@@ -27,6 +27,7 @@ Resources:
     Properties:
       DisplayName: !Sub "${ResourcesPrefix}-${Environment}-sns"
       TopicName: !Sub "${ResourcesPrefix}-${Environment}-sns"
+      KmsMasterKeyId: alias/aws/sns
       Tags:
         - Key: Name
           Value: !Sub "${ResourcesPrefix}-${Environment}-sns"
