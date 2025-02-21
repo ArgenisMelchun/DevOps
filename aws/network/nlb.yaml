@@ -78,10 +78,6 @@ Resources:
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref ALBTargetGroup
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Team
-          Value: !Ref Team
 
 Outputs:
   NLB:
