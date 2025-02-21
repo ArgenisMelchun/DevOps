@@ -10,14 +10,19 @@ Parameters:
     Type: String
 
   ProjectName:
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
     Type: String
-    Default: WVM-Advanced-Logistics-Analytics
 
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
-      ClusterName: !Sub "${ResourcesPrefix}-ecs-cluster"
+      ClusterName: !Sub "${ResourcesPrefix}-${Environment}-ecs-cluster"
       ClusterSettings:
         - Name: containerInsights
           Value: enabled
@@ -29,11 +34,16 @@ Resources:
           Weight: 1
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-ecs-cluster"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-ecs-cluster"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
+
 Outputs:
   ECSCluster:
     Description: ECS cluster
