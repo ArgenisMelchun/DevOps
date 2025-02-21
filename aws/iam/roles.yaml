@@ -13,8 +13,13 @@ Parameters:
     Type: String
 
   ProjectName:
-    Type: String
-    Default: WVM-Advanced-Logistics-Analytics  
+    Type: String 
+
+  Environment:
+    Type: String 
+    
+  Team:
+    Type: String 
 
 Resources:
   TaskExecutionRole:
@@ -49,6 +54,28 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/ecs/${ResourcesPrefix}-task:*"
+        - PolicyName: S3Access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource: !Sub "arn:aws:s3:::${S3BucketName}"
+        - PolicyName: SNSPublishAccess
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Ref SNSTopicArn
       Tags:
         - Key: Name
           Value: !Sub "${ResourcesPrefix}-ecs-taskexecution-role"
@@ -56,6 +83,12 @@ Resources:
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
   
   EventBridgeRole:
     Type: AWS::IAM::Role
@@ -88,7 +121,12 @@ Resources:
           Value: !Ref StackName
         - Key: Project
           Value: !Ref ProjectName
-
+        - Key: Project
+          Value: !Ref ProjectName
+        - Key: Environment
+          Value: !Ref Environment
+        - Key: Team
+          Value: !Ref Team
 
 Outputs:
   TaskExecutionRoleARN:
@@ -98,3 +136,6 @@ Outputs:
   EventBridgeRoleArn:
     Description: "ARN del Role utilizado por EventBridge para ejecutar ECS Task"
     Value: !GetAtt EventBridgeRole.Arn
+
+
+# TODO restrict the permissions of the roles

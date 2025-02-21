@@ -59,5 +59,10 @@ Resources:
           - Key: Team
             Value: !Ref Team
 
+Outputs:
+  S3BucketName:
+    Description: "Name of the created S3 bucket"
+    Value: !Ref S3Bucket
+
 # Open Questions:
   # Object lock will be enabled?

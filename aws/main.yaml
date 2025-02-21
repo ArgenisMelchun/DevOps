@@ -233,13 +233,6 @@ Parameters:
     Description: Specify the team responsible for the deployment
 
 Resources:
-# RoleStack:
-#   Type: AWS::CloudFormation::Stack
-#   Properties:
-#     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
-#     Parameters:
-#       ResourcesPrefix: !Ref ResourcesPrefix
-#       SecretArn: !GetAtt RDSStack.Outputs.SecretArn
 # SGStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
@@ -268,6 +261,13 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
+# RoleStack:
+#   Type: AWS::CloudFormation::Stack
+#   Properties:
+#     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
+#     Parameters:
+#       ResourcesPrefix: !Ref ResourcesPrefix
+#       SecretArn: !GetAtt RDSStack.Outputs.SecretArn  
   # EndPointStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
