@@ -26,11 +26,11 @@ Resources:
   CloudWatchLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: !Sub "/ecs/${ResourcesPrefix}-task"
+      LogGroupName: !Sub "/ecs/${ResourcesPrefix}-${Environment}-task"
       RetentionInDays: !Ref CWLogGroupRetentionInDays
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-ecs-log-group"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-ecs-log-group"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project

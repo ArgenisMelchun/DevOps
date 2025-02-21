@@ -274,6 +274,12 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
+  #ECSStack:
+  #  Type: AWS::CloudFormation::Stack
+  #  Properties:
+  #    TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
+  #    Parameters:
+  #      ResourcesPrefix: !Ref ResourcesPrefix
   # RDSStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
@@ -329,12 +335,7 @@ Resources:
   #       Subnets: !Ref PublicSubnets
   #       ALBArn: !GetAtt ALBStack.Outputs.ALBArn
   #       ResourcesPrefix: !Ref ResourcesPrefix
-  # ECSStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
+
   # FrontendStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
