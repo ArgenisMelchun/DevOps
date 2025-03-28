@@ -101,6 +101,15 @@ Resources:
       CidrIp: 0.0.0.0/0
       Description: Allow HTTP traffic from the internet
 
+  ALBIngress443:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ALBSecurityGroup
+      IpProtocol: tcp
+      FromPort: 443
+      ToPort: 443
+      CidrIp: 0.0.0.0/0
+      Description: Allow HTTPS traffic from the internet
 
   ALBIngress5000:
     Type: AWS::EC2::SecurityGroupIngress
