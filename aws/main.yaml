@@ -22,31 +22,6 @@ Parameters:
     Default: /i24-081-dev-infrastructure/DBUsername
     Description: The username for the database instance
 
-  DBInstanceClass:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /i24-081-dev-infrastructure/DBInstanceClass
-    Description: The instance class for the database
-
-  DBEngine:
-    Type: String
-    Default: postgres
-    Description: The database engine to use
-  
-  DBBackupRetentionPeriod:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /i24-081-dev-infrastructure/DBBackupRetentionPeriod
-    Description: Number of days to retain automatic backups
-
-  DBPreferredBackupWindow:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /i24-081-dev-infrastructure/DBPreferredBackupWindow
-    Description: Time window for automated backups (UTC time)
-
-  DBPreferredMaintenanceWindow:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /i24-081-dev-infrastructure/DBPreferredMaintenanceWindow
-    Description: Time window for RDS maintenance (UTC time)
-
   PrivateSubnets:
     Type: AWS::SSM::Parameter::Value<String>
     Default: /i24-081-dev-infrastructure/PrivateSubnets
@@ -317,24 +292,6 @@ Resources:
   #       Subnets: !Ref PublicSubnets
   #       ALBArn: !GetAtt ALBStack.Outputs.ALBArn
   #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # RDSStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/database/rds.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       DBUsername: !Ref DBUsername
-  #       DBInstanceClass: !Ref DBInstanceClass
-  #       DBEngine: !Ref DBEngine
-  #       DatabaseSecurityGroup: !GetAtt SGStack.Outputs.DatabaseSecurityGroup
-  #       PrivateSubnets: !Ref PrivateSubnets
-  #       DBBackupRetentionPeriod: !Ref DBBackupRetentionPeriod
-  #       DBPreferredBackupWindow: !Ref DBPreferredBackupWindow
-  #       DBPreferredMaintenanceWindow: !Ref DBPreferredMaintenanceWindow
   #       ProjectName: !Ref ProjectName
   #       Environment: !Ref Environment
   #       Team: !Ref Team

@@ -73,23 +73,6 @@ Resources:
         - Key: Team
           Value: !Ref Team
 
-  DatabaseSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for RDS database
-      VpcId: !Ref VPCId
-      Tags:
-        - Key: Name
-          Value: !Sub "${ResourcesPrefix}-${Environment}-database-sg"
-        - Key: Stack
-          Value: !Ref StackName
-        - Key: Project
-          Value: !Ref ProjectName
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Team
-          Value: !Ref Team
-
   VPCEndpointsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -170,26 +153,6 @@ Resources:
       SourceSecurityGroupId: !Ref ALBSecurityGroup
       Description: Allow inbound traffic from the ALB on port 5001
 
-  DatabaseIngress5432:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref DatabaseSecurityGroup
-      IpProtocol: tcp
-      FromPort: 5432
-      ToPort: 5432
-      SourceSecurityGroupId: !Ref BackendSecurityGroup
-      Description: Allow inbound traffic from the backend ECS service
-
-  DatabaseIngressAll:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      GroupId: !Ref DatabaseSecurityGroup
-      IpProtocol: tcp
-      FromPort: 5432
-      ToPort: 5432
-      CidrIp: 0.0.0.0/0
-      Description: Allow inbound traffic from the internet
-
   VPCEndpointsIngressFrontend: 
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -234,13 +197,7 @@ Resources:
       CidrIp: 0.0.0.0/0
       Description: Allow all outbound traffic
 
-  DatabaseEgress:
-    Type: AWS::EC2::SecurityGroupEgress
-    Properties:
-      GroupId: !Ref DatabaseSecurityGroup
-      IpProtocol: -1
-      CidrIp: 0.0.0.0/0
-      Description: Allow all outbound traffic
+
 
   VPCEndpointsEgress:
     Type: AWS::EC2::SecurityGroupEgress
@@ -262,10 +219,6 @@ Outputs:
   BackendSecurityGroup:
     Description: Security group for the backend ECS service
     Value: !Ref BackendSecurityGroup
-
-  DatabaseSecurityGroup:
-    Description: Security group for the RDS instance
-    Value: !Ref DatabaseSecurityGroup
 
   VPCEndpointsSecurityGroup:
     Description: Security group for VPC Endpoints

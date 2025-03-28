@@ -65,31 +65,12 @@ Parameters:
     AllowedPattern: ^[a-zA-Z][a-zA-Z0-9_]*$
     ConstraintDescription: Must start with a letter and contain only alphanumeric characters or underscores
 
-  DBInstanceClass:
-    Type: String
-    Default: db.t3.micro
-    Description: The instance class for the database
-    AllowedValues:
-      - "db.t3.micro"
-      - "db.t3.small"
-      - "db.t3.medium"
-      - "db.t3.large"
-      - "db.t3.xlarge"
-      - "db.t3.2xlarge"
-    ConstraintDescription: Must be a valid RDS instance class
-
   DBBackupRetentionPeriod:
     Type: Number
     Default: 7
     MinValue: 1
     MaxValue: 35
     Description: Number of days to retain automatic backups
-
-  DBPreferredBackupWindow:
-    Type: String
-    Default: 07:00-08:00
-    Description: Time window for automated backups (UTC time)
-    AllowedPattern: ^([01]?[0-9]|2[0-3]):[0-5][0-9]-([01]?[0-9]|2[0-3]):[0-5][0-9]$
 
   DBPreferredMaintenanceWindow:
     Type: String
@@ -392,20 +373,6 @@ Resources:
         Environment: !Ref Environment
         Team: !Ref Team
 
-  DBInstanceClassParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBInstanceClass"
-      Type: String
-      Value: !Ref DBInstanceClass
-      Description: The instance class for the database
-      Tags:
-        Name: !Sub "${ResourcesPrefix}-${Environment}-dbinstanceclass-parameter"
-        Stack: ssm-parameters.yaml
-        Project: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
-
   FrontendImageRepositoryParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -462,20 +429,6 @@ Resources:
         Environment: !Ref Environment
         Team: !Ref Team
 
-  DBBackupRetentionPeriodParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBBackupRetentionPeriod"
-      Type: String
-      Value: !Ref DBBackupRetentionPeriod
-      Description: "Number of days to retain automatic backups"
-      Tags:
-        Name: !Sub "${ResourcesPrefix}-${Environment}-dbbackupretentionperiod-parameter"
-        Stack: ssm-parameters.yaml
-        Project: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
-
   DBPreferredBackupWindowParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -485,20 +438,6 @@ Resources:
       Description: "Time window for automated backups (UTC time)"
       Tags:
         Name: !Sub "${ResourcesPrefix}-${Environment}-dbpreferredbackupwindow-parameter"
-        Stack: ssm-parameters.yaml
-        Project: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
-
-  DBPreferredMaintenanceWindowParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBPreferredMaintenanceWindow"
-      Type: String
-      Value: !Ref DBPreferredMaintenanceWindow
-      Description: "Time window for RDS maintenance (UTC time)"
-      Tags:
-        Name: !Sub "${ResourcesPrefix}-${Environment}-dbpreferredmaintenancewindow-parameter"
         Stack: ssm-parameters.yaml
         Project: !Ref ProjectName
         Environment: !Ref Environment
