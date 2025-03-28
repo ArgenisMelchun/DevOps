@@ -429,20 +429,6 @@ Resources:
         Environment: !Ref Environment
         Team: !Ref Team
 
-  DBPreferredBackupWindowParameter:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub "/${ResourcesPrefix}-${Environment}-infrastructure/DBPreferredBackupWindow"
-      Type: String
-      Value: !Ref DBPreferredBackupWindow
-      Description: "Time window for automated backups (UTC time)"
-      Tags:
-        Name: !Sub "${ResourcesPrefix}-${Environment}-dbpreferredbackupwindow-parameter"
-        Stack: ssm-parameters.yaml
-        Project: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
-
   CWLogGroupRetentionInDaysParameter:
     Type: AWS::SSM::Parameter
     Properties:
