@@ -47,7 +47,7 @@ Resources:
         - Key: Team
           Value: !Ref Team
 
-  ALB80TargetGroup:
+  ALBHTTPTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: !Sub "${ResourcesPrefix}-${Environment}-alb-80-tg"
@@ -69,7 +69,7 @@ Resources:
         - Key: Team
           Value: !Ref Team
 
-  ALB443TargetGroup:
+  ALBHTTPSTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: !Sub "${ResourcesPrefix}-${Environment}-alb-443-tg"
@@ -92,7 +92,7 @@ Resources:
           Value: !Ref Team
 
 
-  NLBListener80:
+  NLBHTTPListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref NLB
@@ -100,9 +100,9 @@ Resources:
       Protocol: TCP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref ALB80TargetGroup
+          TargetGroupArn: !Ref ALBHTTPTargetGroup
 
-  NLBListener443:
+  NLBHTTPSListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref NLB
@@ -110,7 +110,7 @@ Resources:
       Protocol: TCP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref ALB443TargetGroup
+          TargetGroupArn: !Ref ALBHTTPSTargetGroup
 
 Outputs:
   NLB:
