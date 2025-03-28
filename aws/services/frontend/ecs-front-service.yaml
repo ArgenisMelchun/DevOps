@@ -47,7 +47,7 @@ Parameters:
   SSLCertificateArn:
     Type: String
     Description: ARN of the SSL certificate for HTTPS
-    default: arn:aws:acm:us-east-1:302672446683:certificate/31f11806-4c72-4af5-96fb-a2be6f7b0aa9
+    Default: arn:aws:acm:us-east-1:302672446683:certificate/31f11806-4c72-4af5-96fb-a2be6f7b0aa9
 
   HealthCheckGracePeriodSeconds:
     Type: Number

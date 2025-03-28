@@ -306,34 +306,34 @@ Resources:
         Environment: !Ref Environment
         Team: !Ref Team
         SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
-  # FrontendStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   DependsOn: EndPointStack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/frontend-main.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       ALB: !GetAtt ALBStack.Outputs.ALB
-  #       Subnets: !Ref PublicSubnets
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       TargetGroupName: !Ref FrontendTargetGroupName
-  #       ContainerPort: !Ref FrontendContainerPort
-  #       TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
-  #       ContainerName: !Ref FrontendContainerName
-  #       ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
-  #       ECRImageRepository: !Ref FrontendImageRepository
-  #       TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
-  #       ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
-  #       CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
-  #       SecurityGroup: !GetAtt SGStack.Outputs.FrontendSecurityGroup
-  #       BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
-  #       ServiceName: !Ref FrontendServiceName
-  #       DesiredCount: !Ref DesiredCount
-  #       TaskCpu: !Ref FrontendTaskCpu
-  #       TaskMemory: !Ref FrontendTaskMemory
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
+  FrontendStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: EndPointStack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/frontend-main.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        ALB: !GetAtt ALBStack.Outputs.ALB
+        Subnets: !Ref PublicSubnets
+        ResourcesPrefix: !Ref ResourcesPrefix
+        TargetGroupName: !Ref FrontendTargetGroupName
+        ContainerPort: !Ref FrontendContainerPort
+        TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
+        ContainerName: !Ref FrontendContainerName
+        ECSCluster: !GetAtt ECSStack.Outputs.ECSCluster
+        ECRImageRepository: !Ref FrontendImageRepository
+        TaskExecutionRoleARN: !GetAtt RoleStack.Outputs.TaskExecutionRoleARN
+        ALBDNSName: !GetAtt ALBStack.Outputs.ALBDNSName
+        CloudWatchLogGroupName: !GetAtt CloudWatchLogGroupStack.Outputs.CloudWatchLogGroupName
+        SecurityGroup: !GetAtt SGStack.Outputs.FrontendSecurityGroup
+        BaseTemplateURLParameter: !Ref BaseTemplateURLParameter
+        ServiceName: !Ref FrontendServiceName
+        DesiredCount: !Ref DesiredCount
+        TaskCpu: !Ref FrontendTaskCpu
+        TaskMemory: !Ref FrontendTaskMemory
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   # BackendStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
