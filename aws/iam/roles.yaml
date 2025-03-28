@@ -9,9 +9,6 @@ Parameters:
   ResourcesPrefix:
     Type: String
 
-  SecretArn:
-    Type: String
-
   ProjectName:
     Type: String 
 
@@ -42,14 +39,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
       Policies:
-        - PolicyName: SecretsManagerAccess
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - secretsmanager:GetSecretValue
-                Resource: !Ref SecretArn
         - PolicyName: CloudWatchLogsAccess
           PolicyDocument:
             Version: "2012-10-17"
