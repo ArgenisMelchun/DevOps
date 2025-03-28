@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Name of the S3 bucket
-S3_BUCKET="stack-vwm-advanced-logistics-analytics-infrastructure"
+# Validar si $BUCKET_NAME tiene un valor
+if [ -z "$S3_BUCKET" ]; then
+  echo "Error: The environment variable BUCKET_NAME is not defined or is empty."
+  exit 1
+fi
 
 # Get the directory where the script is located and move one level up
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

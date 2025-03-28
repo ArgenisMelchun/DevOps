@@ -4,6 +4,7 @@ Description: CloudFormation template to create an S3 bucket
 Parameters:
   BucketName:
     Type: String
+    Default: cf-templates-bucket
     
   StackName:
     Type: String
@@ -11,18 +12,23 @@ Parameters:
 
   ResourcesPrefix:
     Type: String
+    Default: i24-081
 
   BucketVersioningConfiguration:
     Type: String
+    Default: Enabled
 
   ProjectName:
     Type: String 
+    Default: vwm-advanced-logistics-analitics
 
   Environment:
     Type: String 
+    Default: dev
     
   Team:
     Type: String 
+    Default: abat
 
 Resources:
   S3Bucket:

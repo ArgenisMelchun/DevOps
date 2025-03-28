@@ -98,7 +98,6 @@ Resources:
     DeletionPolicy: Snapshot
     Properties:
       DBInstanceIdentifier: !Sub "${ResourcesPrefix}-${Environment}-rds-instance"
-      DBName: !Sub "${ResourcesPrefix}${Environment}database"
       MasterUsername: !Ref DBUsername
       MasterUserPassword: !Sub "{{resolve:secretsmanager:${RDSSecret}::password}}"
       Engine: !Ref DBEngine
@@ -141,10 +140,6 @@ Outputs:
   RDSInstancePort:
     Description: The connection port for the RDS instance
     Value: !GetAtt RDSInstance.Endpoint.Port
-
-  DBName:
-    Description: The name of the RDS database
-    Value: !Sub "${ResourcesPrefix}${Environment}database"
 
   DBUsername:
     Description: The username for the RDS database

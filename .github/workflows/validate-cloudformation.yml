@@ -32,7 +32,7 @@ jobs:
       # Step 4: Upload CloudFormation templates to S3
       - name: Upload files to S3
         env:
-          S3_BUCKET: stack-vwm-advanced-logistics-analytics-infrastructure
+          S3_BUCKET: i24-081-dev-vwm-logistics-analytics-infra-bucket
         run: aws/scripts/upload-to-s3.sh
 
       # Step 5: Install dependencies for linting and validation
@@ -48,5 +48,5 @@ jobs:
         run: |
           cfn-lint aws/main.yaml
           aws cloudformation validate-template \
-            --template-url https://s3.amazonaws.com/stack-vwm-advanced-logistics-analytics-infrastructure/main.yaml
+            --template-url https://s3.amazonaws.com/i24-081-dev-vwm-logistics-analytics-infra-bucket/main.yaml
         continue-on-error: true
