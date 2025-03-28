@@ -94,7 +94,7 @@ Resources:
   FrontendServiceStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/ecs-service.yaml"
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/ecs-front-service.yaml"
       Parameters:
         VPCId: !Ref VPCId
         Subnets: !Ref Subnets
