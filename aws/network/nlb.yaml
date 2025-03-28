@@ -47,10 +47,10 @@ Resources:
         - Key: Team
           Value: !Ref Team
 
-  ALB80TargetGroup:
+  ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
-      Name: !Sub "${ResourcesPrefix}-${Environment}-alb-80-tg"
+      Name: !Sub "${ResourcesPrefix}-${Environment}-alb-tg"
       VpcId: !Ref VPCId
       Protocol: TCP
       Port: 80
@@ -59,7 +59,7 @@ Resources:
         - !Ref ALBArn  
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-80-tg"
+          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-tg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project
@@ -69,30 +69,7 @@ Resources:
         - Key: Team
           Value: !Ref Team
 
-  ALB443TargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: !Sub "${ResourcesPrefix}-${Environment}-alb-443-tg"
-      VpcId: !Ref VPCId
-      Protocol: TCP
-      Port: 443
-      TargetType: alb
-      LoadBalancerArns:
-        - !Ref ALBArn  
-      Tags:
-        - Key: Name
-          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-443-tg"  # Updated tag to match
-        - Key: Stack
-          Value: !Ref StackName
-        - Key: Project
-          Value: !Ref ProjectName
-        - Key: Environment
-          Value: !Ref Environment
-        - Key: Team
-          Value: !Ref Team
-
-
-  NLBListener80:
+  NLBListener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref NLB
@@ -100,17 +77,7 @@ Resources:
       Protocol: TCP
       DefaultActions:
         - Type: forward
-          TargetGroupArn: !Ref ALB80TargetGroup
-
-  NLBListener443:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      LoadBalancerArn: !Ref NLB
-      Port: 443
-      Protocol: TCP
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref ALB443TargetGroup
+          TargetGroupArn: !Ref ALBTargetGroup
 
 Outputs:
   NLB:
