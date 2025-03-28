@@ -301,7 +301,6 @@ Resources:
       TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
       Parameters:
         ResourcesPrefix: !Ref ResourcesPrefix
-        SecretArn: !GetAtt RDSStack.Outputs.SecretArn
         S3BucketName: !GetAtt S3Stack.Outputs.S3BucketName
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
