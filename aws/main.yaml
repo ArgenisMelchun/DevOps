@@ -218,17 +218,17 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  # S3Stack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/s3/s3.yaml"
-  #     Parameters:
-  #       BucketName: !Ref BucketName
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       BucketVersioningConfiguration: !Ref BucketVersioningConfiguration
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
+  S3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/s3/s3.yaml"
+      Parameters:
+        BucketName: !Ref BucketName
+        ResourcesPrefix: !Ref ResourcesPrefix
+        BucketVersioningConfiguration: !Ref BucketVersioningConfiguration
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
   # SNSStack:
   #   Type: AWS::CloudFormation::Stack
   #   Properties:
