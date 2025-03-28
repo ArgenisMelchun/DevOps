@@ -229,84 +229,84 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  # SNSStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/sns/sns.yaml"
-  #     Parameters:
-  #       EmailEndpoint: !Ref EmailEndpoint
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # CloudWatchLogGroupStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # ECSStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # EndPointStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PrivateSubnets: !Ref PrivateSubnets
-  #       RouteTables: !Ref RouteTables
-  #       VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # ALBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       PublicSubnets: !Ref PublicSubnets
-  #       ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # NLBStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
-  #     Parameters:
-  #       VPCId: !Ref VPCId
-  #       Subnets: !Ref PublicSubnets
-  #       ALBArn: !GetAtt ALBStack.Outputs.ALBArn
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  # RoleStack:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
-  #     Parameters:
-  #       ResourcesPrefix: !Ref ResourcesPrefix
-  #       SecretArn: !GetAtt RDSStack.Outputs.SecretArn
-  #       S3BucketName: !GetAtt S3Stack.Outputs.S3BucketName
-  #       ProjectName: !Ref ProjectName
-  #       Environment: !Ref Environment
-  #       Team: !Ref Team
-  #       SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
+  SNSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/sns/sns.yaml"
+      Parameters:
+        EmailEndpoint: !Ref EmailEndpoint
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  CloudWatchLogGroupStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/logging/cloudwatch-log-group.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        CWLogGroupRetentionInDays: !Ref CWLogGroupRetentionInDays
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  ECSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/compute/ecs-cluster.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  EndPointStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/endpoints.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PrivateSubnets: !Ref PrivateSubnets
+        RouteTables: !Ref RouteTables
+        VPCEndpointsSecurityGroup: !GetAtt SGStack.Outputs.VPCEndpointsSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  ALBStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/alb.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        PublicSubnets: !Ref PublicSubnets
+        ALBSecurityGroup: !GetAtt SGStack.Outputs.ALBSecurityGroup
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  NLBStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/network/nlb.yaml"
+      Parameters:
+        VPCId: !Ref VPCId
+        Subnets: !Ref PublicSubnets
+        ALBArn: !GetAtt ALBStack.Outputs.ALBArn
+        ResourcesPrefix: !Ref ResourcesPrefix
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+  RoleStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/iam/roles.yaml"
+      Parameters:
+        ResourcesPrefix: !Ref ResourcesPrefix
+        SecretArn: !GetAtt RDSStack.Outputs.SecretArn
+        S3BucketName: !GetAtt S3Stack.Outputs.S3BucketName
+        ProjectName: !Ref ProjectName
+        Environment: !Ref Environment
+        Team: !Ref Team
+        SNSTopicArn: !GetAtt SNSStack.Outputs.SNSTopicArn
   # FrontendStack:
   #   Type: AWS::CloudFormation::Stack
   #   DependsOn: EndPointStack
