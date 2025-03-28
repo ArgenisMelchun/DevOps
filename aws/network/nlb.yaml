@@ -81,7 +81,7 @@ Resources:
         - !Ref ALBArn  
       Tags:
         - Key: Name
-          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-443-tg"  # Updated tag to match
+          Value: !Sub "${ResourcesPrefix}-${Environment}-alb-443-tg"
         - Key: Stack
           Value: !Ref StackName
         - Key: Project

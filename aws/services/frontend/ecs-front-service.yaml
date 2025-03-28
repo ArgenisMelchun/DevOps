@@ -109,9 +109,11 @@ Resources:
       Protocol: HTTPS
       Certificates:
         - CertificateArn: !Ref SSLCertificateArn
+      SslPolicy: ELBSecurityPolicy-TLS13-1-2-2021-06
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
+
 
   Service:
     Type: AWS::ECS::Service
