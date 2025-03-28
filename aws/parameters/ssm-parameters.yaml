@@ -32,7 +32,7 @@ Parameters:
 
   BaseTemplateURL:
     Type: String
-    Default: https://i24-081-<environment>-vwm-logistics-analytics-infra-bucket
+    Default: https://i24-081-environment-vwm-logistics-analytics-infra-bucket
     Description: The base URL for the S3 bucket where the CloudFormation templates are stored
     AllowedPattern: ^https://[a-zA-Z0-9._/-]+/?$
 
@@ -269,7 +269,7 @@ Parameters:
   # Bucket
   BucketName:
     Type: String
-    Default: files-bucket
+    Default: vwm-advanced-logistics-analytics-files-bucket
     Description: "Name of the S3 bucket to be created"
     AllowedPattern: ^[a-z0-9.-]{3,63}$
 
