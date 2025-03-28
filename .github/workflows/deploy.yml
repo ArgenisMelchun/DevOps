@@ -36,7 +36,7 @@ jobs:
       # Step 5: Deploy or update CloudFormation stack
       - name: Deploy CloudFormation Stack
         run: |
-          STACK_NAME="i24-081-dev-vwm-logistics-analytics-infra-stack"
+          STACK_NAME="i24-081-dev-vwm-logistics-analytics-infra2-stack"
           TEMPLATE_URL="https://i24-081-dev-vwm-logistics-analytics-infra-bucket.s3.amazonaws.com/main.yaml"
 
           echo "Checking if stack $STACK_NAME exists..."

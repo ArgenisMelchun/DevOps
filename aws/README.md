@@ -1,6 +1,6 @@
 #
 
 1.-The first step is to generate the main.yaml. You can create this template using /scripts/main/generate_cloudformation.sh see scripts/README.md here the prefix and environment will be requested. 
-2.-Then the second step is to create the bucket where the templates will be stored to create the infrastructurion throgh cloud formation use a meaningfull names such as: i24-081-dev-vwm-logistics-analytics-infra-stack and vwm-logistics-analytics-infra-bucket. You can sue the use source to persist environment variables /scripts/create-or-update-s3-bucket.sh script see scripts/README.md
+2.-Then the second step is to create the bucket where the templates will be stored to create the infrastructurion throgh cloud formation use a meaningfull names such as: i24-081-dev-vwm-logistics-analytics-infra-bucket-stack and vwm-logistics-analytics-infra-bucket. You can sue the use source to persist environment variables /scripts/create-or-update-s3-bucket.sh script see scripts/README.md
 3.-Then upload cloud formation tempates to the created bucket usign /scripts/upload-to-s3.sh
 4.-Now create the stack of the parameters here all parameters will be defined. Create this manually to set all values. give it a meaninful name such as: i24-081-<environment>-vwm-advanced-logistics-analytics-infra-parameters. This is used to set all te parameters that will be used then in the root tack main to create the infrastructure
