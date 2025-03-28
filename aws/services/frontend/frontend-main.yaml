@@ -91,25 +91,25 @@ Resources:
         ProjectName: !Ref ProjectName
         Environment: !Ref Environment
         Team: !Ref Team
-  FrontendServiceStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/ecs-front-service.yaml"
-      Parameters:
-        VPCId: !Ref VPCId
-        Subnets: !Ref Subnets
-        ALB: !Ref ALB
-        SecurityGroup: !Ref SecurityGroup
-        StackName: !Ref StackName
-        ResourcesPrefix: !Ref ResourcesPrefix
-        ServiceName: !Ref ServiceName
-        TargetGroupName: !Ref TargetGroupName
-        ContainerPort: !Ref ContainerPort
-        TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
-        ContainerName: !Ref ContainerName
-        ECSCluster: !Ref ECSCluster
-        TaskDefinitionArn: !GetAtt FrontendTaskDefinitionStack.Outputs.TaskDefinitionArn
-        DesiredCount: !Ref DesiredCount
-        ProjectName: !Ref ProjectName
-        Environment: !Ref Environment
-        Team: !Ref Team
+  # FrontendServiceStack:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: !Sub "${BaseTemplateURLParameter}.s3.${AWS::Region}.amazonaws.com/services/frontend/ecs-front-service.yaml"
+  #     Parameters:
+  #       VPCId: !Ref VPCId
+  #       Subnets: !Ref Subnets
+  #       ALB: !Ref ALB
+  #       SecurityGroup: !Ref SecurityGroup
+  #       StackName: !Ref StackName
+  #       ResourcesPrefix: !Ref ResourcesPrefix
+  #       ServiceName: !Ref ServiceName
+  #       TargetGroupName: !Ref TargetGroupName
+  #       ContainerPort: !Ref ContainerPort
+  #       TargetGroupHealthCheckPath: !Ref TargetGroupHealthCheckPath
+  #       ContainerName: !Ref ContainerName
+  #       ECSCluster: !Ref ECSCluster
+  #       TaskDefinitionArn: !GetAtt FrontendTaskDefinitionStack.Outputs.TaskDefinitionArn
+  #       DesiredCount: !Ref DesiredCount
+  #       ProjectName: !Ref ProjectName
+  #       Environment: !Ref Environment
+  #       Team: !Ref Team
